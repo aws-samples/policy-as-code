@@ -1,8 +1,8 @@
-+++
+---
 title = "AWS Policy as Code Workshop"
 chapter = true
 weight = 2
-+++
+---
 This workshop will help developers and security practitioners become familiar with implementing policy as code. Participants can explore these tools in more details below:
 
 * [AWS Cloudformation Guard](https://github.com/aws-cloudformation/cloudformation-guard).
