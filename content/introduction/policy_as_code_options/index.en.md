@@ -1,6 +1,5 @@
 ---
 title: "Tools for Validating CF Templates"
-chapter: true
 weight: 20
 ---
 

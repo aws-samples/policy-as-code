@@ -1,6 +1,5 @@
 ---
 title: "AWS Cloudformation Guard"
-chapter: true
 weight: 30
 ---
 

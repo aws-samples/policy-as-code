@@ -1,6 +1,5 @@
 ---
 title: "Advance Topics"
-chapter: true
 weight: 85
 ---
 

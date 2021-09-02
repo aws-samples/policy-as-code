@@ -1,6 +1,5 @@
 ---
 title: "Using Open Policy Agent (Rego)"
-chapter: true
 weight: 40
 ---
 
