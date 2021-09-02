@@ -1,7 +1,7 @@
-+++
-title = "Installing Open Policy Agent"
-weight = 13
-+++
+---
+title: "Installing Open Policy Agent"
+weight: 13
+---
 The following steps describe how to install the Open Policy Agent (opa) cli. </br>
 
 We strongly suggest you checkout: 

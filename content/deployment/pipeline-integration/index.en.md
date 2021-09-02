@@ -1,7 +1,7 @@
-+++
-title = "Integration with a pipeline"
-weight = 61
-+++
+---
+title: "Integration with a pipeline"
+weight: 61
+---
 
 In this chapter we will demonstrate how to integrate CFGuard/OPA with a pipeline. Rule validation of the CF template will be executed as part of the deployment, failing to deploy should there be a violation.
 

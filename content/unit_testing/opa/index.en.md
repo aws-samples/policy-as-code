@@ -1,7 +1,7 @@
-+++
-title = "Open Policy Agent"
-weight = 21
-+++
+---
+title: "Open Policy Agent"
+weight: 21
+---
 
 The Open Policy Agent (opa) command line comes with a test subcommand for testing Rego policies. The following steps describe how to install **opa**. </br>
 

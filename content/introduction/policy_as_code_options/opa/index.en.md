@@ -1,7 +1,7 @@
-+++
-title = "Open Policy Agent"
-weight = 20
-+++
+---
+title: "Open Policy Agent"
+weight: 20
+---
 
 ### What is Open Policy Agent?
 The Open Policy Agent(OPA) is an open source, general-purpose policy engine that unifies policy enforcement across the stack. OPA provides a high-level declarative language that lets you specify policy as code.

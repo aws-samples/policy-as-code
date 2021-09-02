@@ -1,7 +1,7 @@
-+++
-title = "Managing Polices"
-weight = 51
-+++
+---
+title: "Managing Polices"
+weight: 51
+---
 
 We looked in to a few examples of writing rules in Rego and CFGuard. the next topic we will cover is how to manage rules, or a collective of rules - Polices.
 

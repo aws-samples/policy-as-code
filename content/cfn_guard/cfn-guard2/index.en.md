@@ -1,7 +1,7 @@
-+++
-title = "RDS"
-weight = 42
-+++
+---
+title: "RDS"
+weight: 42
+---
 
 Starting with a policy, we want a AWS RDS instance that is not overly sized and uses a specific instance type, no accessiblity from the internet, and has encryption at rest enabled. Let's write a few rules that would enforce this policy:
 * DBInstance class must use db.m6.<size> where size can be large, xlarge, and 2xlarge

@@ -1,7 +1,7 @@
-+++
-title = "Cloudformation Guard"
-weight = 21
-+++
+---
+title: "Cloudformation Guard"
+weight: 21
+---
 
 **cfn-guard** is written in Rust. The unit tests will depend on the libraries **cfn-guard** uses for its unit test.
 

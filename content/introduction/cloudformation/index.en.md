@@ -1,7 +1,7 @@
-+++
-title = "AWS CloudFormation Template"
-weight = 10
-+++
+---
+title: "AWS CloudFormation Template"
+weight: 10
+---
 AWS CloudFormation(CF) templates represents code as infrastructure that is used by AWS Cloudformation service to deploy cloud infrastructure. Since CF templates contain the resources and configurations of our infrastructure, it is useful to apply rules on the template before deploying cloud infrastructure and applications.
 
 This offers teams quick feedback on any policy compliance issues, significantly reducing the time and effort needed to quickly develop compliant and secure workloads in the cloud.

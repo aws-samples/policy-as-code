@@ -1,7 +1,7 @@
-+++
-title = "Security Group Example"
-weight = 43
-+++
+---
+title: "Security Group Example"
+weight: 43
+---
 
 ### Allow only secure ports
 Let's start with a simple CF template snippet that creates a security group. Create a file **template.json** that contains the content below:

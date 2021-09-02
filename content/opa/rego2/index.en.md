@@ -1,7 +1,7 @@
-+++
-title = "S3 Bucket Example"
-weight = 44
-+++
+---
+title: "S3 Bucket Example"
+weight: 44
+---
 
 Let's explore an example using S3 bucket as our resource.
 

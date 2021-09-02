@@ -1,7 +1,7 @@
-+++
-title = "AWS CloudFormation Guard"
-weight = 15
-+++
+---
+title: "AWS CloudFormation Guard"
+weight: 15
+---
 
 ### What is AWS CloudFormation Guard?
 AWS CloudFormation Guard(cfn-guard) provides compliance administrators with a simple, policy-as-code language to define rules that can check for both required and prohibited resource configurations.

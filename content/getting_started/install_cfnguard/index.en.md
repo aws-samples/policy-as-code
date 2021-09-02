@@ -1,7 +1,7 @@
-+++
-title = "Installing Cloudformation Guard"
-weight = 12
-+++
+---
+title: "Installing Cloudformation Guard"
+weight: 12
+---
 The following steps describe how to install the cfn-guard cli. </br>
 
 We strongly suggest you checkout: 

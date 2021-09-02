@@ -1,7 +1,7 @@
-+++
-title = "Security Group"
-weight = 41
-+++
+---
+title: "Security Group"
+weight: 41
+---
 
 Policy as code must start with a set of rules that will enforce the policy. So let's imagine a simple scenario where our organization requires security groups to only allow ingress access to ports 443 and 22. As a start we should list out what our rules should check for to enforce this policy:
 
