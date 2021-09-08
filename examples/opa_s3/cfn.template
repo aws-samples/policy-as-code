@@ -1,0 +1,51 @@
+{
+  "Resources": {
+    "EncryptedS3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": "encryptedbucket-test",
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "aws:kms",
+                "KMSMasterKeyID": "arn:aws:kms:us-east-1:123456789:key/056ea50b-1013-3907-8617-c93e474e400"
+              },
+              "BucketKeyEnabled": true
+            }
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "foo/Counter/S3/Resource"
+      }
+    },
+    "InvalidEncryptedS3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": "invalid-encryptedbucket-test",
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "foo/Counter/S3/Resource"
+      }
+    },
+    "Invalid2EncryptedS3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": "invalid2-encryptedbucket-test",
+      },
+      "Metadata": {
+        "aws:cdk:path": "foo/Counter/S3/Resource"
+      }
+    }
+  }
+}

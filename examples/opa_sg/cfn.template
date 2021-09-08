@@ -1,0 +1,25 @@
+{
+  "Resources": {
+    "CounterLBSecurityGroup63C1AB9D": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Automatically created Security Group for ELB fooCounterLBAEF24CE8",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow from anyone on port 80",
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "ToPort": 80
+          }
+        ],
+        "VpcId": {
+          "Ref": "Vpc8378EB38"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "foo/Counter/LB/SecurityGroup/Resource"
+      }
+    }
+  }
+}
