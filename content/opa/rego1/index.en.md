@@ -4,7 +4,7 @@ weight: 43
 ---
 
 ### Allow only secure ports
-Let's start with a simple CF template snippet that creates a security group. Create a file **template.json** that contains the content below:
+Let's start with a simple CF template snippet that creates a security group. Create a file **cfn.template** that contains the content below:
 
 ````
     "Resources": {
@@ -48,7 +48,7 @@ deny_non_secured_ports = false  {
 ```
 We can test the rule by running the below command:
 ```
-opa eval -i template.json -d check-sg-limit-secured-port.rego data.security_group.deny_non_secured_ports --explain=notes
+opa eval -i cfn.template -d check-sg-limit-secured-port.rego data.security_group.deny_non_secured_ports --explain=notes
 ```
 Results:
 ```
@@ -114,7 +114,7 @@ In order to see you can use the content of a variable you can use the "trace" co
 ### No shared security group without exemption
 Let's explore a more complex example. Assume we wish every EC2 instance to be created along with a security group rather than referencing an existing one. Additionally, we allow for exemptions through a tag in the metadata part of the resource.
 
-Update our file **template.json** with the contents below:
+Update our file **cfn.template** with the contents below:
 ```
 {
           "Resources": {
@@ -236,9 +236,9 @@ violation[retVal] {
 #    trace(sprintf("compliant_sg_ref=%s", [compliant_sg_ref]))
 
     count(non_compliant_resources) > 0
-    retVal := { msgJson |
+    retVal := { ms.template |
         sg = non_compliant_resources[_]
-        msgJson := {
+        ms.template := {
             "resource": sg,
             "message": "The Security group resource is not compliant, please fix the useage of this security group and try again."
         }
@@ -343,7 +343,7 @@ You may use "False" statement in a rule in order to look at the trace output and
 {{% /notice %}}
 Let's run the rule:
 ```
-opa eval -i template.json -d check-no-shared-sg.rego data.security_group.allow
+opa eval -i cfn.template -d check-no-shared-sg.rego data.security_group.allow
 
 ```
 Result
@@ -372,7 +372,7 @@ you can run the command below to view all the document rules evaluation - this i
 {{% /notice %}}
 
 ```
-opa eval -i template.json -d check-no-shared-sg.rego data.security_group
+opa eval -i cfn.template -d check-no-shared-sg.rego data.security_group
 ```
 Now let's check what happen when we make changes which will create non-compliant resources. Make the following changes below: 
 
@@ -383,5 +383,5 @@ Now let's check what happen when we make changes which will create non-compliant
 
 Don't forget to add --explain=notes to see the appropriate message from the noncompliance resource and run with:
 ```
-opa eval -i template.json -d check-no-shared-sg.rego data.security_group --explain=notes
+opa eval -i cfn.template -d check-no-shared-sg.rego data.security_group --explain=notes
 ```

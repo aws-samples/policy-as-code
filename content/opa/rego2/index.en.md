@@ -7,7 +7,7 @@ Let's explore an example using S3 bucket as our resource.
 
 ### Deny unencrypted buckets 
 
-Create the file **template.json** with the contents below:
+Create the file **cfn.template** with the contents below:
 
 ```
 {
@@ -90,9 +90,9 @@ allow = false {
 
 violation[retVal] {
     count(deny_sse_algorithm) > 0
-    retVal := { msgJson |
+    retVal := { ms.template |
         s3 = deny_sse_algorithm[_]
-        msgJson := {
+        ms.template := {
             "resource": s3,
             "decision": "deny",
             "message": "S3 bucket server side encryption (SSE) is required. Objects can be encrypted **only** with KMS-Managed Keys (SSE-KMS)."
@@ -102,9 +102,9 @@ violation[retVal] {
 
 violation[retVal] {
     count(deny_without_sse) > 0
-    retVal := { msgJson |
+    retVal := { ms.template |
         s3 = deny_without_sse[_]
-        msgJson := {
+        ms.template := {
             "resource": s3,
             "decision": "deny",
             "message": "S3 bucket server side encryption (SSE) is required. Please enable BucketEncryption to protect data-at-rest."
@@ -137,7 +137,7 @@ By default every line we write in a rule is a logical AND operator. If one of th
 
 In this case, a violation occurs if either the bucket encryption does not exist or if the encryption algorithm used is not allowed. Let's run the rule and look at the results
 ```
-opa eval -i template.json -d check-s3-deny-unencrypted-buckets.rego data.s3.bucket_encryption
+opa eval -i cfn.template -d check-s3-deny-unencrypted-buckets.rego data.s3.bucket_encryption
 ```
 Results:
 ```
