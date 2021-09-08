@@ -9,10 +9,12 @@ Points to consider:
 - How and Where do we store polices? -- see [Managing Polices](/advance-topics/managing-policies.html)
 - Should we consolidate the validation process as one "stage" or segregate them to multiple. i.e running OPA and CFGuard as two separate stages, or a combination of rules(strict rule) as a stage, and additional optional rules as another stage.
 - What is the expected action when a rule/stage fails?
+- Should certain rule failures stop the pipelines?
+- CLI Flags: Each tools will have options that change their behavior that will be useful in a pipeline environment
 - At what part of the pipeline would it make sense to integrate the validation?
 - Providing local validation for developers for fast response, rather than deploying the source code as a pipeline
-
-
+- Should you enable developers to run the same checks locally before pushing their code? This will allow developers to get feedback faster than comitting, pushing and waiting for pipeline feedback.
+- Using any of these tools within your own environment will probably require building a Docker Image for your CI/CD tools to use as a build image - how will you maintain and publish this docker image?
 ## Architecture Diagram
 {{< img "pipeline.png" "pipeline Architecture" >}}
 
