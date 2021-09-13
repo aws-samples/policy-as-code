@@ -126,7 +126,7 @@ Update our file **cfn.template** with the contents below:
                         {
                           "CidrIp": "0.0.0.0/0",
                           "Description": "Allow all outbound traffic by default",
-                          "IpProtocol": "-1"
+                          "IpProtocol": "-1"x
                         }
                       ],
                       "SecurityGroupIngress": [
