@@ -3,92 +3,122 @@ title: "Security Group"
 weight: 41
 ---
 
-Policy as code must start with a set of rules that will enforce the policy. So let's imagine a simple scenario where our organization requires security groups to only allow ingress access to ports 443 and 22. As a start we should list out what our rules should check for to enforce this policy:
+Policy as code starts with a set of rules that will enforce the policy. So let's imagine a simple policy where our organization is looking to only communicate with secure protocols such as https and ssh. A policy might be stated like this:
 
-* Allow ingress traffic to port 443 and 22 only
-* Allow no ingress traffic
+*All network accessible services should only use protocols https or ssh. Network services should only be accessible via corporate network IP address spaces.*
+
+As a start we can use AWS Security Group resources since this is a primary mechanism to enforce network level access in the cloud. Our rules might look like the following:
+
+* Allow ingress traffic to port 443 and/or 22 only
 * Disallow all other ingress traffic
+* Allow only CIDR ranges 10.0.0.0/16
 * Only allow protocol tcp
 
-Next we need a set of security groups that we can use to test the implementations of these rules. With cfn-guard we can create a unit test file that does exactly that. Let's put that unit test file together. Create a file named **sg_ingress_test.yaml** with the contents below:
+Next we need provide cloudformation snippets that test the implementations of these rules. Create a file named **sg_ingress_test.yaml** with the contents below:
 
 ```
-- input:
+- name: Check for a empty list of security groups
+  input:
     Resources: {}
   expectations:
     rules:
-        check_security_group_ingress: SKIP
+        check_sgs_empty: PASS
 ```
-This is a dummy test meant to make sure that we have syntactically correct rules. We want to be familiar with cfn-guard and get it to run succesfully to start. Create a file named **sg_ingress.yaml** as specified below:
+This initial unit test will get us started. It gives a cloudformation snippet that has an empty **Resource** and a rule called check_sgs_empty that we expect to evaluate to **PASS**. We haven't written the rule check_sgs_empty but we clearly understand that in order for this test to pass, it needs to evaluate sgs (Which is a variable that isn't defined yet but meant to represents a list of security groups) as empty. We can do that by creating a file named **sg_ingress.guard** as specified below:
 
 ```
-rule check_security_group_ingress {
-  let sgs = Resources.*[ Type == 'AWS::EC2::SecurityGroups' ]
+let sgs = Resources.*[ Type == 'AWS::EC2::SecurityGroup' ]
+rule check_sgs_empty {
+    %sgs empty
 }
 ```
-
-This rule doesn't do much other than assign security groups within a given template to the variable **sgs** We will be adding more to this as we add more unit tests. For now let's see if we can get our first unit test to pass:
+The first line queries **Resources** looking for all AWS::EC2::SecurityGroup that are specified. The rule check_sgs_empty returns a PASS if %sgs is empty. Let's see if we can get our first unit test to pass:
 
 ```
-cfn-guard test --rules-file sg_ingress.guard --test-data sg_ingress.guard
+cfn-guard test -r sg_ingress.guard -t sg_ingress_test.yaml
 ```
 
 The output should look something like this:
 
 ```
-PASS Expected Rule = check_security_group_ingress, Status = SKIP, Got Status = SKIP
+Test Case #1
+Name: "Check for a empty list of security groups"
+  PASS Rules:
+    check_sgs_empty: Expected = PASS, Evaluated = PASS
 ```
 
-Great, we now have a syntactically correct rule and unit test file. It's time to start developing our rules to enforce our organizations policy.
+Why did this rule PASS? Because the expectation is to **PASS**. There are other outcomes like **FAIL** or **SKIP** that we can set for expected. Even if you have a rule that evaluates to **PASS** but you expected it to **FAIL** or **SKIP** it will fail the test case. At this point we should have a syntactically correct rule and unit test file. Congrats! You've written your first passing unit test. It's time to start writing our rules to enforce our policy.
 
-We will add the following contents to our existing **sg_ingress_test.guard** file:
-
+We will **ADD** the following contents to our existing unit file **sg_ingress_test.yaml**:
 ```
-- input:
+- name: Security group with single to/from port 443
+  input:
     Resources:
         TestSecurityGroup:
             Type: AWS::EC2::SecurityGroup
             Properties:
-                GroupDescription: Allows port ingress port 80
+                GroupDescription: Allows ngress port per policy
                 SecurityGroupIngress:
-                - CidrIp: 0.0.0.0/0
-                  Description: Allow anyone to connect to port 80
+                - CidrIp: 10.0.0.0/16
+                  Description: Allow anyone to connect to port 443
                   FromPort: 443
                   IpProtocol: tcp
-                  ToPort: 80
+                  ToPort: 443
                 VpcId:
-                    Ref: Vpc8378EB38
+                    Ref: VpcABCDEF
             Metadata:
                 aws:cdk:path: foo/Counter/LB/SecurityGroup/Resource
   expectations:
     rules:
+        check_sgs_empty: FAIL
         check_security_group_ingress: PASS
 ```
 
-Here we have a security group that will allow ingress to port 443. This should fail when we run the test as we haven't written a rule to check this port. Let's run it and see what result we get:
+Here we have a security group that will allow ingress to port 443.
+
+Also we need to **ADD** this rule to our rule file **sg_ingress.guard**:
+```
+rule check_security_group_ingress {
+    %sgs empty
+}
+```
+This should fail when we run the test as we are expecting to have an empty list of security groups. It will not be empty because our test has a single resource which is a security group.
+
+Let's run it and see what result we get:
 
 ```
-cfn-guard test --rules-file sg_ingress.guard --test-data sg_ingress.guard
+cfn-guard test -r sg_ingress.guard -t sg_ingress_test.yaml
 ```
 
 The results you should get looks like the following:
 
 ```
-PASS Expected Rule = check_security_group_ingress, Status = SKIP, Got Status = SKIP
-FAILED Expected Rule = check_security_group_ingress, Status = PASS, Got Status = SKIP
+Test Case #1
+Name: "Check for a empty list of security groups"
+  No Test expectation was set for Rule check_security_group_ingress
+  PASS Rules:
+    check_sgs_empty: Expected = PASS, Evaluated = PASS
+
+Test Case #2
+Name: "Security Group with single to/from port 443"
+  FAILED Rules:
+    check_security_group_ingress: Expected = PASS, Evaluated = FAIL
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
 ```
 
-We now have a **FAILED Expected Rule** on the 2nd unit test. Instead of getting the expected status **PASS** we get **SKIP** because there are no rules for checking the ingress port number. Let's update **sg_ingress.guard** with the contents shown below:
+We now have a **FAILED Expected Rule** on the 2nd test case. Instead of getting the expected status **PASS** we get **FAIL** because our rule is expecting an empty list of security groups. Let's **UPDATE** our rules file **sg_ingress.guard** with the contents shown below:
 
 ```
 rule check_security_group_ingress {
-    let sgs = Resources.*[ Type == 'AWS::EC2::SecurityGroup' ]
-
     when %sgs !empty {
         %sgs {
             Properties {
                 SecurityGroupIngress[*] {
                     FromPort == 443
+                    ToPort == 443
+                    IpProtocol exists
+                    IpProtocol == 'tcp'
                 }
             }
         }
@@ -96,73 +126,100 @@ rule check_security_group_ingress {
 }
 ```
 
-Here we add a conditional for the security group and if we are given no security group resources we will skip. That is what the **when %sgs !empty** guards against. This should allow us to pass the first test. The rest of it is checking our properties, specifically the ingress port of the FromPort attribute. Running this again we should have passing unit tests:
+Here we add a conditional for the security group and if we are given no security group resources this rule will be skipped. That is what the line **when %sgs !empty** guards against. This should allow us to pass the first test. Note that we use the [*] to denote a list or array of SecurityGroupIngress objects. We also check the properties of any of the SecurityGroupIngress objects and if any of them don't match the properties we are expecting the rule will evaluate to **FAIL**. Running this again we should have passing unit tests:
 
 ```
-cfn-guard test --rules-file sg_ingress.guard --test-data sg_ingress.guard
+cfn-guard test -r sg_ingress.guard -t sg_ingress_test.yaml
 ```
 
 The output looks like this:
 
 ```
-PASS Expected Rule = check_security_group_ingress, Status = SKIP, Got Status = SKIP
-PASS Expected Rule = check_security_group_ingress, Status = PASS, Got Status = PASS
+Test Case #1
+Name: "Check for a empty list of security groups"
+  No Test expectation was set for Rule check_security_group_ingress
+  PASS Rules:
+    check_sgs_empty: Expected = PASS, Evaluated = PASS
+
+Test Case #2
+Name: "Security Group with single to/from port 443"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = PASS, Evaluated = PASS
 ```
 
-So far so good, however we've specified a single port. There is going to be a problem with port 22 which is permissible. Let's add that to our unit test (After you add this you should have 3 unit tests defined.):
+So far so good. However we've specified a single port and this rule will fail if a SecurityGroupIngress specifies to/from port 22 which is permissible. Let's **ADD** that to our unit test (After you add this you should have 3 unit tests defined.):
 
 ```
-- input:
+- name: Security group that specifies 443 and 22
+  input:
     Resources:
         TestSecurityGroup:
             Type: AWS::EC2::SecurityGroup
             Properties:
-                GroupDescription: Allows port ingress port 80
+                GroupDescription: Allows ingress port per policy
                 SecurityGroupIngress:
-                - CidrIp: 0.0.0.0/0
-                  Description: Allow anyone to connect to port 80
+                - CidrIp: 10.0.0.0/16
+                  Description: Allow anyone to connect to port 443
                   FromPort: 443
                   IpProtocol: tcp
-                  ToPort: 80
-                - CidrIp: 0.0.0.0/0
-                  Description: Allow anyone to connect to port 80
+                  ToPort: 443
+                - CidrIp: 10.0.0.0/16
+                  Description: Allow anyone to connect to port 22
                   FromPort: 22
                   IpProtocol: tcp
-                  ToPort: 80
+                  ToPort: 22
                 VpcId:
                     Ref: Vpc8378EB38
             Metadata:
                 aws:cdk:path: foo/Counter/LB/SecurityGroup/Resource
   expectations:
     rules:
+        check_sgs_empty: FAIL
         check_security_group_ingress: PASS
 ```
 
 Running this again:
 
 ```
-cfn-guard test --rules-file sg_ingress.guard --test-data sg_ingress.guard
+cfn-guard test -r sg_ingress.guard -t sg_ingress_test.yaml
 ```
 
 We should see something like:
 
 ```
-PASS Expected Rule = check_security_group_ingress, Status = SKIP, Got Status = SKIP
-PASS Expected Rule = check_security_group_ingress, Status = PASS, Got Status = PASS
-FAILED Expected Rule = check_security_group_ingress, Status = PASS, Got Status = FAIL
+Test Case #1
+Name: "Check for a empty list of security groups"
+  No Test expectation was set for Rule check_security_group_ingress
+  PASS Rules:
+    check_sgs_empty: Expected = PASS, Evaluated = PASS
+
+Test Case #2
+Name: "Security group with single to/from port 443"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = PASS, Evaluated = PASS
+
+Test Case #3
+Name: "Security group that specifies to/from port 443 and 22"
+  FAILED Rules:
+    check_security_group_ingress: Expected = PASS, Evaluated = FAIL
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
 ```
 
-Here the last test fails as expected because we haven't added a rule that will allow port 22. We should add this to our rules file **sg_ingress.guard**. Update the contents as show below:
+Here the last test fails as expected because we haven't added a rule that will allow port 22. We should **UPDATE** this check to our rules file **sg_ingress.guard**:
 
 ```
 rule check_security_group_ingress {
-    let sgs = Resources.*[ Type == 'AWS::EC2::SecurityGroup' ]
-
     when %sgs !empty {
         %sgs {
             Properties {
                 SecurityGroupIngress[*] {
                     FromPort in [443, 22]
+                    ToPort in [443, 22]
+                    IpProtocol exists
+                    IpProtocol == 'tcp'
                 }
             }
         }
@@ -173,101 +230,96 @@ rule check_security_group_ingress {
 Running our test again:
 
 ```
-cfn-guard test --rules-file sg_ingress.guard --test-data sg_ingress.guard
+cfn-guard test -r sg_ingress.guard -t sg_ingress_test.yaml
 ```
 
 We should see something like:
 
 ```
-PASS Expected Rule = check_security_group_ingress, Status = SKIP, Got Status = SKIP
-PASS Expected Rule = check_security_group_ingress, Status = PASS, Got Status = PASS
-PASS Expected Rule = check_security_group_ingress, Status = PASS, Got Status = PASS
+Test Case #1
+Name: "Check for a empty list of security groups"
+  No Test expectation was set for Rule check_security_group_ingress
+  PASS Rules:
+    check_sgs_empty: Expected = PASS, Evaluated = PASS
+
+Test Case #2
+Name: "Security group with single to/from port 443"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = PASS, Evaluated = PASS
+
+Test Case #3
+Name: "Security group that specifies to/from port 443 and 22"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = PASS, Evaluated = PASS
 ```
 
-We should allow for security groups that don't have ingress ports defined at all. Let's see what happens when we add a test for that. Add the following test in your unit test file **sg_ingress_test.yaml** (you should have 4 unit tests after adding this one):
+Now let's add a port that would violate our policy in our unit test. Add the following test in your unit test file **sg_ingress_test.yaml** (you should have 4 unit tests after adding this one):
 
 ```
-- input:
+- name: Security group with to/from port 80
+  input:
     Resources:
         TestSecurityGroup:
             Type: AWS::EC2::SecurityGroup
             Properties:
                 GroupDescription: Allows port ingress port 80
                 SecurityGroupIngress:
-                    CidrIp: 0.0.0.0/0
+                    CidrIp: 10.0.0.0/16
                     Description: Allow anyone to connect to port 80
                     IpProtocol: tcp
                     ToPort: 80
+                    FromPort: 80
                 VpcId:
                     Ref: Vpc8378EB38
             Metadata:
                 aws:cdk:path: foo/Counter/LB/SecurityGroup/Resource
   expectations:
     rules:
-        check_security_group_ingress: PASS
+        check_sgs_empty: FAIL
+        check_security_group_ingress: FAIL
 ```
 
 Again we run our unit tests:
 
 ```
-cfn-guard test --rules-file sg_ingress.guard --test-data sg_ingress.guard
+cfn-guard test -r sg_ingress.guard -t sg_ingress_test.yaml
 ```
 
 The output looks like this:
 
 ```
-PASS Expected Rule = check_security_group_ingress, Status = SKIP, Got Status = SKIP
-PASS Expected Rule = check_security_group_ingress, Status = PASS, Got Status = PASS
-PASS Expected Rule = check_security_group_ingress, Status = PASS, Got Status = PASS
-FAILED Expected Rule = check_security_group_ingress, Status = PASS, Got Status = FAIL
+Test Case #1
+Name: "Check for a empty list of security groups"
+  No Test expectation was set for Rule check_security_group_ingress
+  PASS Rules:
+    check_sgs_empty: Expected = PASS, Evaluated = PASS
+
+Test Case #2
+Name: "Security Group with single to/from port 443"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = PASS, Evaluated = PASS
+
+Test Case #3
+Name: "Security group that specifies to/from port 443 and 22"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = PASS, Evaluated = PASS
+
+Test Case #4
+Name: "Security group with to/from port 80"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = FAIL, Evaluated = FAIL
 ```
 
-Our rule doesn't take into consideration security groups with no ingress port and so it fails. Let's add a rule to **sg_ingress.guard** that will check for that:
+Excellent it seems that our rules would catch a CF template that tried to provision a security group allowing inbound access to port 80 which is a violation of our stated policies. However are we testing for CIDR ranges? Let's add a test to do that:
 
 ```
-rule check_security_group_ingress {
-    let sgs = Resources.*[ Type == 'AWS::EC2::SecurityGroup' ]
-
-    when %sgs !empty {
-        %sgs {
-            Properties {
-                SecurityGroupIngress[*] {
-                    FromPort in [443, 22] OR
-                    FromPort is empty
-                }
-            }
-        }
-    }
-}
-```
-
-Running our unit tests:
-
-```
-cfn-guard test --rules-file sg_ingress.guard --test-data sg_ingress.guard
-```
-
-The output looks like this:
-
-```
-PASS Expected Rule = check_security_group_ingress, Status = SKIP, Got Status = SKIP
-PASS Expected Rule = check_security_group_ingress, Status = PASS, Got Status = PASS
-PASS Expected Rule = check_security_group_ingress, Status = PASS, Got Status = PASS
-PASS Expected Rule = check_security_group_ingress, Status = PASS, Got Status = PASS
-```
-
-Finally as an exercise try to see if you can check that the protocol is tcp. Remember to write your unit test first and see if the test fails. Than add or update the rule to pass the test.
-
-Below is a sample of a working unit test with a rule that checks for tcp:
-
-File **sg_ingress_test.yaml**
-```
-- input:
-    Resources: {}
-  expectations:
-    rules:
-        check_security_group_ingress: SKIP
-- input:
+- name: Security Group with to/from port 443 from anywhere
+  input:
     Resources:
         TestSecurityGroup:
             Type: AWS::EC2::SecurityGroup
@@ -278,95 +330,177 @@ File **sg_ingress_test.yaml**
                   Description: Allow anyone to connect to port 80
                   FromPort: 443
                   IpProtocol: tcp
-                  ToPort: 80
+                  ToPort: 443
                 VpcId:
-                    Ref: Vpc8378EB38
+                    Ref: VpcABCDEF
             Metadata:
                 aws:cdk:path: foo/Counter/LB/SecurityGroup/Resource
   expectations:
     rules:
-        check_security_group_ingress: PASS
-- input:
-    Resources:
-        TestSecurityGroup:
-            Type: AWS::EC2::SecurityGroup
-            Properties:
-                GroupDescription: Allows port ingress port 80
-                SecurityGroupIngress:
-                - CidrIp: 0.0.0.0/0
-                  Description: Allow anyone to connect to port 80
-                  FromPort: 443
-                  IpProtocol: tcp
-                  ToPort: 80
-                - CidrIp: 0.0.0.0/0
-                  Description: Allow anyone to connect to port 80
-                  FromPort: 22
-                  IpProtocol: tcp
-                  ToPort: 80
-                VpcId:
-                    Ref: Vpc8378EB38
-            Metadata:
-                aws:cdk:path: foo/Counter/LB/SecurityGroup/Resource
-  expectations:
-    rules:
-        check_security_group_ingress: PASS
-- input:
-    Resources:
-        TestSecurityGroup:
-            Type: AWS::EC2::SecurityGroup
-            Properties:
-                GroupDescription: Allows port ingress port 80
-                SecurityGroupIngress:
-                    CidrIp: 0.0.0.0/0
-                    Description: Allow anyone to connect to port 80
-                    IpProtocol: tcp
-                    ToPort: 80
-                VpcId:
-                    Ref: Vpc8378EB38
-            Metadata:
-                aws:cdk:path: foo/Counter/LB/SecurityGroup/Resource
-  expectations:
-    rules:
-        check_security_group_ingress: PASS
-- input:
-    Resources:
-        TestSecurityGroup:
-            Type: AWS::EC2::SecurityGroup
-            Properties:
-                GroupDescription: Allows port ingress port 80
-                SecurityGroupIngress:
-                    CidrIp: 0.0.0.0/0
-                    Description: Allow anyone to connect to port 80
-                    FromPort: 443
-                    IpProtocol: udp
-                    ToPort: 80
-                VpcId:
-                    Ref: Vpc8378EB38
-            Metadata:
-                aws:cdk:path: foo/Counter/LB/SecurityGroup/Resource
-  expectations:
-    rules:
+        check_sgs_empty: FAIL
         check_security_group_ingress: FAIL
 ```
 
-Rules **sg_ingress.guard**
+Once we update our **sg_ingress_test.yaml** we will run our command:
 
 ```
-rule check_security_group_ingress {
-    let sgs = Resources.*[ Type == 'AWS::EC2::SecurityGroup' ]
+cfn-guard test -r sg_ingress.guard -t sg_ingress_test.yaml
+```
 
+The results will look like this:
+
+```
+Test Case #1
+Name: "Check for a empty list of security groups"
+  No Test expectation was set for Rule check_security_group_ingress
+  PASS Rules:
+    check_sgs_empty: Expected = PASS, Evaluated = PASS
+
+Test Case #2
+Name: "Security Group with single to/from port 443"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = PASS, Evaluated = PASS
+
+Test Case #3
+Name: "Security group that specifies to/from port 443 and 22"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = PASS, Evaluated = PASS
+
+Test Case #4
+Name: "Security group with to/from port 80"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = FAIL, Evaluated = FAIL
+
+Test Case #5
+Name: "Security Group with to/from port 443 from anywhere"
+  FAILED Rules:
+    check_security_group_ingress: Expected = FAIL, Evaluated = PASS
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+```
+Here we have **FAILED Rules** from check_security_group_ingress. Although it was expected to **FAIL** because we are using a wide open CIDR 0.0.0.0/0 it evaluated as a **PASS**. This isn't the expected behavior because our rules should **FAIL** when a CIDR other than 10.0.0.0/16 is given. Currently our rules do not check CIDR ranges at all. Let's **UPDATE** our rules file **sg_ingress.guard**:
+```
+rule check_security_group_ingress {
     when %sgs !empty {
         %sgs {
             Properties {
                 SecurityGroupIngress[*] {
-                    IpProtocol in ['tcp']
-                    FromPort in [443, 22] OR
-                    FromPort empty
+                    CidrIp == '10.0.0.0/16'
+                    FromPort in [443, 22]
+                    ToPort in [443, 22]
+                    IpProtocol exists
+                    IpProtocol == 'tcp'
                 }
             }
         }
     }
 }
 ```
+With our added property check for CidrIp the output should look like this:
 
+```
+Test Case #1
+Name: "Check for a empty list of security groups"
+  No Test expectation was set for Rule check_security_group_ingress
+  PASS Rules:
+    check_sgs_empty: Expected = PASS, Evaluated = PASS
 
+Test Case #2
+Name: "Security Group with single to/from port 443"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = PASS, Evaluated = PASS
+
+Test Case #3
+Name: "Security group that specifies to/from port 443 and 22"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = PASS, Evaluated = PASS
+
+Test Case #4
+Name: "Security group with to/from port 80"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = FAIL, Evaluated = FAIL
+
+Test Case #5
+Name: "Security Group with to/from port 443 from anywhere"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = FAIL, Evaluated = FAIL
+```
+Let's see if our rules would successfully catch a protocol violation. Add another unit test to **sg_ingress_test.yaml**:
+```
+- name: Security Group with udp ingress 443
+  input:
+    Resources:
+        TestSecurityGroup:
+            Type: AWS::EC2::SecurityGroup
+            Properties:
+                GroupDescription: Allows port ingress port 80
+                SecurityGroupIngress:
+                - CidrIp: 10.0.0.0/16
+                  Description: Allow anyone to connect to port 80
+                  FromPort: 443
+                  IpProtocol: udp
+                  ToPort: 443
+                VpcId:
+                    Ref: VpcABCDEF
+            Metadata:
+                aws:cdk:path: foo/Counter/LB/SecurityGroup/Resource
+  expectations:
+    rules:
+        check_sgs_empty: FAIL
+        check_security_group_ingress: FAIL
+```
+And the result should look like this:
+```
+Test Case #1
+Name: "Check for a empty list of security groups"
+  No Test expectation was set for Rule check_security_group_ingress
+  PASS Rules:
+    check_sgs_empty: Expected = PASS, Evaluated = PASS
+
+Test Case #2
+Name: "Security Group with single to/from port 443"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = PASS, Evaluated = PASS
+
+Test Case #3
+Name: "Security group that specifies to/from port 443 and 22"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = PASS, Evaluated = PASS
+
+Test Case #4
+Name: "Security group with to/from port 80"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = FAIL, Evaluated = FAIL
+
+Test Case #5
+Name: "Security Group with to/from port 443 from anywhere"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = FAIL, Evaluated = FAIL
+
+Test Case #6
+Name: "Security Group with udp ingress 443"
+  PASS Rules:
+    check_sgs_empty: Expected = FAIL, Evaluated = FAIL
+    check_security_group_ingress: Expected = FAIL, Evaluated = FAIL
+```
+Fantastic, it seems our rules would catch CF templates attempting to use udp as the protocol.
+
+Let's review the rules that will enforce our policy:
+
+* Allow ingress traffic to port 443 and/or 22 only
+* Disallow all other ingress traffic
+* Allow only CIDR ranges 10.0.0.0/16
+* Only allow protocol tcp
+
+We have written 6 test cases that test each of these rules. Congratulations! You are well on your way to becoming a policy as code ninja.
