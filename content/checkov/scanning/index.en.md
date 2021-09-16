@@ -4,9 +4,10 @@ weight: 32
 ---
 ### Checkov Scanning
 * Checkov has a large built in library for a variety of AWS Resouces for multiple Languages. 
-
-* Create a new file called `cfn.yaml` and add this content to new file
-* This Role has a very dangerous admin policy which a developer should not adding to any IAM Role, Checkov will find multiple issues with the policy 
+* The main reason for AWS Developers to use Checkov is support for CloudFormation and Terraform
+* Create a new file called `cfn.yaml` and add this content to new file or download the file from the assets repo
+* The template contains a role has a very dangerous admin policy which a developer should not be adding to any IAM Role, Checkov will find multiple issues with the policy. There is also a default S3 Bucket here which will trigger a handful of less critical findings that we will use an example.
+* See code below
 ```yaml
 Resources:
   TestSecurityGroup:
@@ -24,6 +25,7 @@ Resources:
     Metadata:
       aws:cdk:path: foo/Counter/LB/SecurityGroup/Resource
   RootRole:
+    #checkov:skip=CKV_AWS_110 Admin policy required
     Type: 'AWS::IAM::Role'
     Properties:
       AssumeRolePolicyDocument:
@@ -53,7 +55,6 @@ Resources:
 * Run Checkov on the directory `checkov -s --directory .`
 * This example will fail `CKV_AWS_110` "Ensure IAM policies does not allow privilege escalation"
 
-
 ### Review Findings
 * The S3 Bucket Resource will trigger a handful of results that need to be addressed
     * CKV_AWS_19
@@ -63,17 +64,23 @@ Resources:
     * CKV_AWS_21
     * CKV_AWS_55
     * CKV_AWS_56
-* Checkov results usually include a range of risk you are mitigating, but there is no way to filter
+* Checkov results usually include a range of risk you are mitigating, but there is no way to filter by risk
     * For example: This S3 Bucket does not include Versioning or Access Logging - these are optional features that do not always need to be enabled
     * This S3 Bucket also does not include the block to Disable Public Access, which your organization may require
 * Your organization will need to determine which failed checks to ignore and let the pipeline proceed and which checks that must be resolved
 
+
 ### Checkov Supression
-* With Checkov, you can add inline comments into your code to supress a specific rule with a comment. 
+* With Checkov, you can add inline comments into your code to supress a specific rule with a comment.
+* Inline comments and Supressions sit with the templates that your Developers are creating
 * Add this line below `RootRole`
-`#checkov:skip=CKV_AWS_110`
-* Run Checkov again `checkov -s --directory .` and you will see `        SKIPPED for resource: AWS::IAM::Role.RootRole`
+`#checkov:skip=CKV_AWS_110 Admin Role required`
+* Run Checkov again `checkov -s --directory .` and you will see `SKIPPED for resource: AWS::IAM::Role.RootRole`
 * You can also skip checks at the command line: `checkov -s --directory . --skip-check CKV_AWS_110`
 * Add this line below `S3Bucket`
 `#checkov:skip=CKV_AWS_21 No S3 Versioning Required`
+  
 
+### Conclusion
+* Determining which checks to fail your pipeline on is much easier than writing the rules that Checkov has already implemented from scratch.
+* Checkov might not be the easiest tool to write new rules for, but it has such a large existing rulespace and is well maintained that it makes sense to include it in most CloudFormation and Terraform Pipelines
