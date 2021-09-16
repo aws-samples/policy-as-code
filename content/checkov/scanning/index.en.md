@@ -44,10 +44,29 @@ Resources:
               - Effect: Allow
                 Action: '*'
                 Resource: '*'
+  S3Bucket:
+    Type: 'AWS::S3::Bucket'
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: DOC-EXAMPLE-BUCKET
 ```
 * Run Checkov on the directory `checkov -s --directory .`
 * This example will fail `CKV_AWS_110` "Ensure IAM policies does not allow privilege escalation"
 
+
+### Review Findings
+* The S3 Bucket Resource will trigger a handful of results that need to be addressed
+    * CKV_AWS_19
+    * CKV_AWS_18
+    * CKV_AWS_53
+    * CKV_AWS_54
+    * CKV_AWS_21
+    * CKV_AWS_55
+    * CKV_AWS_56
+* Checkov results usually include a range of risk you are mitigating, but there is no way to filter
+    * For example: This S3 Bucket does not include Versioning or Access Logging - these are optional features that do not always need to be enabled
+    * This S3 Bucket also does not include the block to Disable Public Access, which your organization may require
+* Your organization will need to determine which failed checks to ignore and let the pipeline proceed and which checks that must be resolved
 
 ### Checkov Supression
 * With Checkov, you can add inline comments into your code to supress a specific rule with a comment. 
@@ -55,3 +74,6 @@ Resources:
 `#checkov:skip=CKV_AWS_110`
 * Run Checkov again `checkov -s --directory .` and you will see `        SKIPPED for resource: AWS::IAM::Role.RootRole`
 * You can also skip checks at the command line: `checkov -s --directory . --skip-check CKV_AWS_110`
+* Add this line below `S3Bucket`
+`#checkov:skip=CKV_AWS_21 No S3 Versioning Required`
+
