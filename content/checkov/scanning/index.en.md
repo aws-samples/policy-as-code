@@ -83,4 +83,6 @@ Resources:
 
 ### Conclusion
 * Determining which checks to fail your pipeline on is much easier than writing the rules that Checkov has already implemented from scratch.
-* Checkov might not be the easiest tool to write new rules for, but it has such a large existing rulespace and is well maintained that it makes sense to include it in most CloudFormation and Terraform Pipelines
+* You can write your own custom Checkov rules - they are written in Python. Checkov regulary accepts Pull Requests on the public repo, but this is not required to integrate your custom checks. 
+* Checkov might not be your preferred tool to write new checks for, but it has such a large existing rulespace and is well maintained that it makes sense to include it in most CloudFormation and Terraform Pipelines
+* Here is a [simple example](https://github.com/bridgecrewio/checkov/pull/1546/commits/68adc6f9e5c45a7cf7981b626efdc5d0ac301eab) of a pull request that has been merged to check for Lambda environment variable encryption if a KMS Key is provided
