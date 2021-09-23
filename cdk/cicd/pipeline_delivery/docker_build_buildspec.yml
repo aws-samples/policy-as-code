@@ -4,6 +4,7 @@ phases:
   pre_build:
     commands:
       - echo logging into docker
+      - rm -rf .python-version
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
   build:
     commands:
