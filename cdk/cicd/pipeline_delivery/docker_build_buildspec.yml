@@ -22,7 +22,7 @@ phases:
       # - echo CODEBUILD_SOURCE_VERSION $CODEBUILD_SOURCE_VERSION
       - npm install -g aws-cdk
       - pip3 install -r ${cicd}/requirements.txt
-      - cd ${app}
+      - cd $CODEBUILD_SRC_DIR/${app}
       - cdk deploy "*" --require-approval never -v --previous-parameters=false
 #      - python3 $CODEBUILD_SRC_DIR/cicd/generate_cb_creds.py
 #      - cat $CODEBUILD_SRC_DIR/cicd/cb_credentials
