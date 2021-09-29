@@ -2,6 +2,7 @@ from aws_cdk import (
     aws_s3 as aws_s3,
     aws_ecr,
     aws_codebuild,
+    aws_codecommit,
     aws_ssm,
     core,
 )
@@ -34,7 +35,7 @@ class Base(core.Stack):
             self, "DockerBuild",
             project_name=f"{props['namespace']}-Docker-Build",
             build_spec=aws_codebuild.BuildSpec.from_source_filename(
-                filename='pipeline_delivery/docker_build_buildspec.yml'),
+                filename='cdk/cicd/pipeline_delivery/docker_build_buildspec.yml'),
             environment=aws_codebuild.BuildEnvironment(
                 privileged=True,
             ),
@@ -48,6 +49,7 @@ class Base(core.Stack):
             description='Pipeline for CodeBuild',
             timeout=core.Duration.minutes(60),
         )
+        # repo
         # codebuild iam permissions to read write s3
         bucket.grant_read_write(cb_docker_build)
 

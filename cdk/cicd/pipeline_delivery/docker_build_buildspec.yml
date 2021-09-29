@@ -1,16 +1,42 @@
 version: 0.2
 
 phases:
+  install:
+
+    runtime-versions:
+      python: 3.8
+      nodejs: 10
+    commands:
+      - apt-get install -y jq
   pre_build:
     commands:
-      - echo logging into docker
       - rm -rf .python-version
-      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+      - ls
+      - export PYTHONPATH=$CODEBUILD_SRC_DIR
+
+      # - cd $CODEBUILD_SRC_DIR
+      # - env | grep -i CODEBUILD_SRC_DIR
+      - env | grep -i CODEBUILD
+      # - echo CODEBUILD_RESOLVED_SOURCE_VERSION $CODEBUILD_RESOLVED_SOURCE_VERSION
+      # - echo CODEBUILD_SOURCE_VERSION $CODEBUILD_SOURCE_VERSION
+      - npm install -g aws-cdk
+      - pip3 install -r requirements.txt
+      - python3 $CODEBUILD_SRC_DIR/cicd/generate_cb_creds.py
+      - cat $CODEBUILD_SRC_DIR/cicd/cb_credentials
+      - export AWS_CONFIG_FILE="$CODEBUILD_SRC_DIR/cicd/cb_credentials"
+      - echo "AWS_CONFIG_FILE=${AWS_CONFIG_FILE}"
+      - ACCOUNT=$(aws sts get-caller-identity --profile dev --query Account --output text)
+      - ARN=$(aws sts get-caller-identity --profile dev --query Arn --output text)
+      - echo deploying to $ARN
+      - export CDK_DEFAULT_ACCOUNT=${ACCOUNT}
+      - export CDK_DEFAULT_REGION=$AWS_DEFAULT_REGION
+      - env | grep -i CDK
+      #- cdk bootstrap -f aws://$ACCOUNT/$AWS_DEFAULT_REGION --profile dev
+
+
+
   build:
     commands:
-      - echo Entered the post_build phase...
-      - echo Build completed on `date`
-      - docker build -t ${tag}:latest pipeline_delivery/
-      - docker tag $tag:latest $ecr:$tag
-      - docker push $ecr
+      - bash cicd/cb-call-cdk.sh
+
 
