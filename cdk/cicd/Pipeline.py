@@ -49,7 +49,7 @@ class Pipeline(core.Stack):
                         aws_codepipeline_actions.CodeBuildAction(
                             action_name='Scan',
                             input=source_output,
-                            outputs=scanned_source,
+                            outputs=[scanned_source],
                             project=props['cb_docker_build'],
                             run_order=1,
                         )

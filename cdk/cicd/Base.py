@@ -4,6 +4,7 @@ from aws_cdk import (
     aws_codebuild,
     aws_codecommit,
     aws_ssm,
+    aws_iam,
     core,
 )
 
@@ -47,7 +48,7 @@ class Base(core.Stack):
                     value='cdk')
             },
             description='Pipeline for CodeBuild',
-            timeout=core.Duration.minutes(60),
+            timeout=core.Duration.minutes(15),
         )
         # repo
         # codebuild iam permissions to read write s3
@@ -66,7 +67,8 @@ class Base(core.Stack):
             description="S3 Bucket",
             value=bucket.bucket_name
         )
-
+        cb_docker_build.role.add_managed_policy(
+            aws_iam.ManagedPolicy.from_aws_managed_policy_name('AdministratorAccess'))
         self.output_props = props.copy()
         self.output_props['bucket']= bucket
         self.output_props['cb_docker_build'] = cb_docker_build
