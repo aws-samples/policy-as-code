@@ -47,6 +47,7 @@ phases:
 #      - cdk deploy "*" --require-approval never -v --previous-parameters=false
 artifacts:
   name: synth
+  packaging: zip
   files:
     - '**/*'
   base-directory: $CODEBUILD_SRC_DIR/cdk/app/cdk.out
