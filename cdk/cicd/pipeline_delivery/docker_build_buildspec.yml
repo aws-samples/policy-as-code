@@ -43,10 +43,10 @@ phases:
       - cd $CODEBUILD_SRC_DIR/${app}
       - cdk synth
 #      - cdk deploy "*" --require-approval never -v --previous-parameters=false
-  artifacts:
-    name: synth
-    files:
-      - '**/*'
-    base-directory: 'cdk.out'
+artifacts:
+  name: synth
+  files:
+    - '**/*'
+  base-directory: 'cdk.out'
 
 
