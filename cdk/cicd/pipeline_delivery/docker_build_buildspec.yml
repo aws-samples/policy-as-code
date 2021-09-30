@@ -43,7 +43,7 @@ phases:
     commands:
       - cd $CODEBUILD_SRC_DIR/${app}
       - cdk synth
-      - cp ${cicd}/scan.yml $CODEBUILD_SRC_DIR/cdk/app/scan.yml # copying the artifact to the new source to avoid dealing with primary and secondary artifacts 
+      - cp $CODEBUILD_SRC_DIR/cdk/cicd/pipeline_delivery/scan.yml $CODEBUILD_SRC_DIR/cdk/app/cdk.out/scan.yml # copying the artifact to the new source to avoid dealing with primary and secondary artifacts
 #      - cdk deploy "*" --require-approval never -v --previous-parameters=false
 artifacts:
   name: synth
