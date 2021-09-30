@@ -41,6 +41,12 @@ phases:
   build:
     commands:
       - cd $CODEBUILD_SRC_DIR/${app}
-      - cdk deploy "*" --require-approval never -v --previous-parameters=false
+      - cdk synth
+#      - cdk deploy "*" --require-approval never -v --previous-parameters=false
+  artifacts:
+    name: synth
+    files:
+      - '**/*'
+    base-directory: 'cdk.out'
 
 

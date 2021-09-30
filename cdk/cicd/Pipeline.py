@@ -12,7 +12,7 @@ class Pipeline(core.Stack):
         super().__init__(app, id, **kwargs)
         # define the s3 artifact
         source_output = aws_codepipeline.Artifact(artifact_name='source')
-        scanned_source = aws_codepipeline.Artifact(artifact_name='scanned_source')
+        synth = aws_codepipeline.Artifact(artifact_name='synth')
         # define the pipeline
         repo = aws_codecommit.Repository(self, "sourcerepo", repository_name='policy-as-code')
 
@@ -47,10 +47,21 @@ class Pipeline(core.Stack):
                     stage_name='Build',
                     actions=[
                         aws_codepipeline_actions.CodeBuildAction(
-                            action_name='Scan',
+                            action_name='Build',
                             input=source_output,
-                            outputs=[scanned_source],
+                            outputs=[synth],
                             project=props['cb_docker_build'],
+                            run_order=1,
+                        )
+                    ]
+                ),
+                aws_codepipeline.StageProps(
+                    stage_name='Scan',
+                    actions=[
+                        aws_codepipeline_actions.CodeBuildAction(
+                            action_name='Scan',
+                            input=synth,
+                            project=props['cb_scan'],
                             run_order=1,
                         )
                     ]

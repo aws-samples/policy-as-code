@@ -50,6 +50,24 @@ class Base(core.Stack):
             description='Pipeline for CodeBuild',
             timeout=core.Duration.minutes(15),
         )
+        scan = aws_codebuild.PipelineProject(
+            self, "scan",
+            project_name=f"{props['namespace']}-scan",
+            build_spec=aws_codebuild.BuildSpec.from_source_filename(
+                filename='cdk/cicd/pipeline_delivery/scan.yml'),
+            environment=aws_codebuild.BuildEnvironment(
+                privileged=True,
+            ),
+            # pass the ecr repo uri into the codebuild project so codebuild knows where to push
+            environment_variables={
+                'ecr': aws_codebuild.BuildEnvironmentVariable(
+                    value=ecr.repository_uri),
+                'tag': aws_codebuild.BuildEnvironmentVariable(
+                    value='cdk')
+            },
+            description='Codebuild Scan',
+            timeout=core.Duration.minutes(15),
+        )
         # repo
         # codebuild iam permissions to read write s3
         bucket.grant_read_write(cb_docker_build)
@@ -72,7 +90,7 @@ class Base(core.Stack):
         self.output_props = props.copy()
         self.output_props['bucket']= bucket
         self.output_props['cb_docker_build'] = cb_docker_build
-
+        self.output_props['cb_scan'] = scan
     # pass objects to another stack
     @property
     def outputs(self):
