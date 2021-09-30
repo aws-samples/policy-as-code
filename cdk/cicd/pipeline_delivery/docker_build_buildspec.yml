@@ -47,6 +47,6 @@ artifacts:
   name: synth
   files:
     - '**/*'
-  base-directory: 'cdk.out'
+  base-directory: $CODEBUILD_SRC_DIR/cdk/app/cdk.out
 
 
