@@ -54,7 +54,7 @@ class Base(core.Stack):
             self, "scan",
             project_name=f"{props['namespace']}-scan",
             build_spec=aws_codebuild.BuildSpec.from_source_filename(
-                filename='scan.yml'),
+                filename='scan_buildspec.yml'),
             environment=aws_codebuild.BuildEnvironment(
                 privileged=True,
             ),
