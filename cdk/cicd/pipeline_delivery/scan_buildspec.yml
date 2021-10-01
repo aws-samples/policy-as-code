@@ -20,4 +20,4 @@ artifacts:
   packaging: zip
   files:
     - '**/*'
-  base-directory: $CODEBUILD_SRC_DIR/cdk/app/
+  base-directory: $CODEBUILD_SRC_DIR
