@@ -44,6 +44,7 @@ phases:
       - cd $CODEBUILD_SRC_DIR/${app}
       - cdk synth
       - cp $CODEBUILD_SRC_DIR/cdk/cicd/pipeline_delivery/scan.yml $CODEBUILD_SRC_DIR/cdk/app/cdk.out/scan.yml # copying the artifact to the new source to avoid dealing with primary and secondary artifacts
+      - cp $CODEBUILD_SRC_DIR/cdk/cicd/pipeline_delivery/checkov-config.yml $CODEBUILD_SRC_DIR/cdk/app/cdk.out/checkov-config.yml
 #      - cdk deploy "*" --require-approval never -v --previous-parameters=false
 artifacts:
   name: synth

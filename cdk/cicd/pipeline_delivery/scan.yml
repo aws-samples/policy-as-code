@@ -12,3 +12,6 @@ phases:
   pre_build:
     commands:
       - rm -rf .python-version
+  build:
+    commands:
+      - checkov --directory . --config-file checkov-config.yml

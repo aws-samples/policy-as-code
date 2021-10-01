@@ -1,0 +1,19 @@
+branch: master
+compact: false
+download-external-modules: true
+evaluate-variables: true
+#external-modules-download-path: .external_modules
+framework: all
+no-guide: false
+output: cli
+quiet: false
+repo-id: bridgecrew/sample-repo
+skip-fixes: true
+skip-framework: dockerfile
+skip-suppressions: false
+soft-fail: false
+skip-check:
+  - CKV_AWS_21
+  - CKV_AWS_116
+soft-fail-on:
+  - CKV_AWS_18

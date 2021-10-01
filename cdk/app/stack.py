@@ -12,7 +12,7 @@ class Main(core.Stack):
         # sns_topic = aws_sns.Topic(
         bucket = aws_s3.Bucket(self, 'Bucket',
                                removal_policy=core.RemovalPolicy.DESTROY,
-                               auto_delete_objects=True,
+                               auto_delete_objects=False,
                                versioned=True,
                                enforce_ssl=True,
                                encryption=aws_s3.BucketEncryption.S3_MANAGED,
