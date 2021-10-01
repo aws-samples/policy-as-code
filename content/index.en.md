@@ -1,11 +1,6 @@
 ---
-title: "AWS Policy as Code Workshop"
-weight: 2
+title: "Overview"
+weight: 1
 ---
-This workshop will help developers and security practitioners become familiar with implementing policy as code. Participants can explore these tools in more details below:
 
-* [AWS Cloudformation Guard](https://github.com/aws-cloudformation/cloudformation-guard).
-* [Open Policy Agent/Rego](https://www.openpolicyagent.org/docs/latest/#rego)
-
-AWS Cloudformation Guard is a open source project, supported by the AWS Cloudformation services team, designed to check AWS CF templates for policy compliance using a simple declaritive syntax. Open Policy Agent is a general purpose policy engine that uses a policy language called Rego to express polices. Participants can use the workshop to explore each of these tools or focus on one of them.
-
+Policy as code automates and enforces organizational policies that are applied to infrastructure as code (IaC). Instead of manually reviewing architectures and workloads, developer and operation teams get immediate feedback on policy violations, allowing them to quickly fix and iterate through policy issues in their workload. Organizations can better manage their risks in the cloud while reducing the friction of deploying compliant and secure workloads. This workshop explores how to codify a set of rules that make up a policy and use a DevSecOps workflow to quickly address and redeploy a demo workload. We will demonstrate this workflow using a CI/CD pipeline. Finally we will also implement these rules in AWS Config to detect and notify operations when resources are not compliant.

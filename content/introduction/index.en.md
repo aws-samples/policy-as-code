@@ -1,6 +1,5 @@
 ---
 title: "Introduction"
-weight: 1
+weight: 2
 ---
-
-Policy as code shifts policy reviews before a single AWS resource is deployed, giving developers immediate feedback on what needs to be done to deploy compliant workloads. It also notifies and alerts operations when a resource is no longer compliant after they are deployed. The result of implementing policy as code is faster business value of a given workload that complies with governance and security policies, helping organizations manage their risks in the cloud. This workshop explores how to codify a set of rules that make up a policy. These rules will be used to validate infrastructure as code (IaC), flagging the code when there is a rule violation and allowing a DevOps workflow to quickly address and redeploy the workload. We will demonstrate this workflow using a CI/CD pipeline that will illustrate aspects of this workflow. Finally we will also implement these rules in AWS Config to detect and notify operations when resources are not compliant.
+Developer, operation, and security teams can become familiar with implementing policy as code by using tools designed for defining rules/policies. Although rules/policies can also be written using existing languages like Python, Ruby, etc they generally require more development effort and skill to develop and maintain. Projects like [cfn-guard](https://github.com/aws-cloudformation/cloudformation-guard) and [Open Policy Agent/Rego](https://www.openpolicyagent.org/docs/latest/#rego); offer high-level languages that are easier to use when writing rules and don't require as much effort and skill to develop, operate, and maintain.
