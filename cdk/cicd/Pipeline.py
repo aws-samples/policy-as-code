@@ -4,6 +4,7 @@ from aws_cdk import (
     aws_ssm,
     aws_codecommit,
     core,
+    aws_cloudformation,
 )
 
 
@@ -13,6 +14,7 @@ class Pipeline(core.Stack):
         # define the s3 artifact
         source_output = aws_codepipeline.Artifact(artifact_name='source')
         synth = aws_codepipeline.Artifact(artifact_name='synth')
+        scanned_source = aws_codepipeline.Artifact(artifact_name='scanned_source')
         # define the pipeline
         repo = aws_codecommit.Repository(self, "sourcerepo", repository_name='policy-as-code')
 
@@ -63,6 +65,17 @@ class Pipeline(core.Stack):
                             input=synth,
                             project=props['cb_scan'],
                             run_order=1,
+                            outputs=[scanned_source]
+                        ),
+                        aws_codepipeline_actions.CloudFormationCreateReplaceChangeSetAction(
+                            action_name='Deploy',
+                            change_set_name='policy-as-code',
+                            stack_name='policy-as-code',
+                            # input=scanned_source,
+                            template_path=aws_codepipeline.ArtifactPath(artifact=scanned_source,file_name='cdk.out/policy-as-code.template.json'),
+                            run_order=2,
+                            cfn_capabilities=[aws_cloudformation.CloudFormationCapabilities.NAMED_IAM],
+                            admin_permissions=True
                         )
                     ]
                 )

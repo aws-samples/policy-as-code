@@ -15,3 +15,9 @@ phases:
   build:
     commands:
       - checkov --directory cdk.out --config-file checkov-config.yml
+artifacts:
+  name: scanned_source
+  packaging: zip
+  files:
+    - '**/*'
+  base-directory: $CODEBUILD_SRC_DIR/cdk/app/
