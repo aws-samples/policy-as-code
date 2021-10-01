@@ -14,4 +14,4 @@ phases:
       - rm -rf .python-version
   build:
     commands:
-      - checkov --directory . --config-file checkov-config.yml
+      - checkov --directory cdk.out --config-file checkov-config.yml
