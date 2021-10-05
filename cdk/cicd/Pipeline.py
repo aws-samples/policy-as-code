@@ -17,7 +17,7 @@ class Pipeline(core.Stack):
         scanned_source = aws_codepipeline.Artifact(artifact_name='scanned_source')
         # define the pipeline
         repo = aws_codecommit.Repository(self, "sourcerepo", repository_name='policy-as-code')
-
+        change_set_name = 'policy-as-code'
         pipeline = aws_codepipeline.Pipeline(
             self, "Pipeline",
             pipeline_name=f"{props['namespace']}",
@@ -58,7 +58,7 @@ class Pipeline(core.Stack):
                     ]
                 ),
                 aws_codepipeline.StageProps(
-                    stage_name='Scan',
+                    stage_name='ScanDeploy',
                     actions=[
                         aws_codepipeline_actions.CodeBuildAction(
                             action_name='Scan',
@@ -68,14 +68,21 @@ class Pipeline(core.Stack):
                             outputs=[scanned_source]
                         ),
                         aws_codepipeline_actions.CloudFormationCreateReplaceChangeSetAction(
-                            action_name='Deploy',
-                            change_set_name='policy-as-code',
-                            stack_name='policy-as-code',
+                            action_name='CreateChangeSet',
+                            change_set_name=change_set_name,
+                            stack_name=change_set_name,
                             # input=scanned_source,
                             template_path=aws_codepipeline.ArtifactPath(artifact=scanned_source,file_name='cdk.out/policy-as-code.template.json'),
                             run_order=2,
                             cfn_capabilities=[aws_cloudformation.CloudFormationCapabilities.NAMED_IAM],
                             admin_permissions=True
+                        ),
+                        aws_codepipeline_actions.CloudFormationExecuteChangeSetAction(
+                            run_order=3,
+                            action_name='ExecuteChangeSet',
+                            change_set_name=change_set_name,
+                            stack_name=change_set_name,
+
                         )
                     ]
                 )
