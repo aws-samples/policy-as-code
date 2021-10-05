@@ -1,6 +1,5 @@
 ---
 title: "Introduction"
-weight: 1
+weight: 2
 ---
-
-In this workshop we primarily focus on validating that a AWS Cloudformation template conforms to a set of policies. The following is a brief description of some important terms and where you can go to learn more.
+Developer, operation, and security teams can become familiar with implementing policy as code by using tools designed for defining rules/policies. Although rules/policies can also be written using existing languages like Python, Ruby, etc they generally require more development effort and skill to develop and maintain. Projects like [cfn-guard](https://github.com/aws-cloudformation/cloudformation-guard) and [Open Policy Agent/Rego](https://www.openpolicyagent.org/docs/latest/#rego); offer high-level languages that are easier to use when writing rules and don't require as much effort and skill to develop, operate, and maintain.

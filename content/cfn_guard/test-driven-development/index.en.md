@@ -1,20 +1,46 @@
 ---
-title: "Security Group"
+title: "Test Driven Development"
 weight: 41
 ---
+
+This section focuses on [Test Driven Development](https://en.wikipedia.org/wiki/Test-driven_development) (TDD). cfn-guard makes this easy because it supports unit tests. In this section we will focus on creating our policy as code in three steps:
+
+**Specify the rules that will enforce our policy**
+   
+**Create a unit test that would test the rule we write**
+   
+**Write a rule that will pass the unit test**
 
 Policy as code starts with a set of rules that will enforce the policy. So let's imagine a simple policy where our organization is looking to only communicate with secure protocols such as https and ssh. A policy might be stated like this:
 
 *All network accessible services should only use protocols https or ssh. Network services should only be accessible via corporate network IP address spaces.*
 
-As a start we can use AWS Security Group resources since this is a primary mechanism to enforce network level access in the cloud. Our rules might look like the following:
+We can use AWS Security Group resources to enforce network level access in the cloud. Our rules might look like the following:
 
 * Allow ingress traffic to port 443 and/or 22 only
 * Disallow all other ingress traffic
 * Allow only CIDR ranges 10.0.0.0/16
 * Only allow protocol tcp
 
-Next we need provide cloudformation snippets that test the implementations of these rules. Create a file named **sg_ingress_test.yaml** with the contents below:
+Next we need provide cloudformation snippets that test the implementations of these rules. First create a directory structure:
+
+```
+mkdir -p sg_demo/tests
+```
+The directory structure looks like this:
+
+```
+sg_demo
+└── tests
+```
+
+Change directory to sg_demo:
+
+```
+cd sg_demo
+```
+
+Create a file named **tests/sg_ingress_test.yaml** with the contents below:
 
 ```
 - name: Check for a empty list of security groups
