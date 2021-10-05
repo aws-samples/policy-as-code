@@ -20,7 +20,7 @@ phases:
       - env | grep -i CODEBUILD
       # - echo CODEBUILD_RESOLVED_SOURCE_VERSION $CODEBUILD_RESOLVED_SOURCE_VERSION
       # - echo CODEBUILD_SOURCE_VERSION $CODEBUILD_SOURCE_VERSION
-      - npm install -g aws-cdk
+      #- npm install -g aws-cdk
       - pip3 install -r ${cicd}/requirements.txt
       - pip3 install -r ${app}/requirements.txt
 
