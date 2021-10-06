@@ -1,3 +1,4 @@
+import aws_cdk.aws_codebuild
 from aws_cdk import (
     aws_s3 as aws_s3,
     aws_ecr,
@@ -49,8 +50,8 @@ class Base(core.Stack):
                 filename='cdk/cicd/pipeline_delivery/docker_build_buildspec.yml'),
             environment=aws_codebuild.BuildEnvironment(
                 privileged=True,
-                build_image=aws_codebuild.LinuxBuildImage.from_ecr_repository(repository=docker_asset.repository, tag=docker_asset.asset_hash)
-
+                #build_image=aws_codebuild.LinuxBuildImage.from_ecr_repository(repository=docker_asset.repository, tag=docker_asset.asset_hash)
+                build_image=aws_cdk.aws_codebuild.LinuxBuildImage.from_docker_registry(name='public.ecr.aws/f3n2w4j5/policy-as-code:latest')
             ),
 
             # pass the ecr repo uri into the codebuild project so codebuild knows where to push
@@ -70,7 +71,10 @@ class Base(core.Stack):
                 filename='scan_buildspec.yml'),
             environment=aws_codebuild.BuildEnvironment(
                 privileged=False,
-                build_image=aws_codebuild.LinuxBuildImage.from_ecr_repository(repository=docker_asset.repository, tag=docker_asset.asset_hash)
+                #build_image=aws_codebuild.LinuxBuildImage.from_ecr_repository(repository=docker_asset.repository, tag=docker_asset.asset_hash)
+                build_image=aws_cdk.aws_codebuild.LinuxBuildImage.from_docker_registry(
+                    name='public.ecr.aws/f3n2w4j5/policy-as-code:latest')
+
             ),
             # pass the ecr repo uri into the codebuild project so codebuild knows where to push
             environment_variables={
