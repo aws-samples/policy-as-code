@@ -49,7 +49,7 @@ class Pipeline(core.Stack):
                     stage_name='Build',
                     actions=[
                         aws_codepipeline_actions.CodeBuildAction(
-                            action_name='Build',
+                            action_name='Synth',
                             input=source_output,
                             outputs=[synth],
                             project=props['cb_docker_build'],
