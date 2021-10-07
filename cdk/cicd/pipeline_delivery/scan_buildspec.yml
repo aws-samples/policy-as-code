@@ -1,0 +1,16 @@
+version: 0.2
+
+phases:
+
+  pre_build:
+    commands:
+      - rm -rf .python-version
+  build:
+    commands:
+      - checkov --directory cdk.out --config-file checkov-config.yml
+artifacts:
+  name: scanned_source
+  packaging: zip
+  files:
+    - '**/*'
+  base-directory: $CODEBUILD_SRC_DIR
