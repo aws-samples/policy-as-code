@@ -4,12 +4,12 @@ weight: 31
 ---
 ## Install CFN Lint CLI
 
-###Python
+### Python
 ```bash
 pip3 install checkov
 ```
 
-###Docker
+### Docker
 * (DockerHub)[https://hub.docker.com/r/bridgecrew/checkov]
 
 ### Verify Checkov Installation
