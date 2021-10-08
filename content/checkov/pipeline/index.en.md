@@ -15,7 +15,7 @@ weight: 33
         * Current working directory
         * Users Home Directory
     * A developer will most likely be able to include their own config file and copy it to a location that Checkov reads before running, your organization will have to decide how to mitigate this risk
-    * Ideally the config files for Checkov are managed in a central repository and Pipeline CI Jobs consume this file from a trusted source
+    * The config files for Checkov must be managed in a central repository and Pipeline CI Jobs consume this file from a trusted source
 
 ### Creating a config file
 * In the same directory that you created the CloudFormation template, create a file called `config.yml`
@@ -25,14 +25,14 @@ weight: 33
 * Add the following lines to `config.yml`
 ```yaml
 skip-check:
-  - CKV_AWS_21
+  - CKV_AWS_21 # Bucket Versioning
 soft-fail-on:
-  - CKV_AWS_18
+  - CKV_AWS_18 # Access Logging
 ```
 * Run the command again `checkov --directory . --config-file config.yaml`
-* This will permanently silence the error about S3 Bucket Versioning not be enabled and will have Checkov run with a handful of specific flags that we need to review:
-* Our organization hasalso  decided that we will never stop S3 Access Logging from letting a Pipeline deploy, but we still want our users see the error, this is the use case for `soft-fail`
-    * `soft-fail:false` This will have the command return 0 regardless of the findings, this should ALWAYS be set to false, otherwise you are scanning to see the results, but they will have no impact on the pipeline status
+* This will permanently skip the check about S3 Bucket Versioning not be enabled and will have Checkov run with a handful of specific flags that we need to review:
+* Our organization has also decided that we will never stop S3 Access Logging not bneing configured from letting a Pipeline deploy, but we still want our users see the error, this is the use case for `soft-fail`
+    * `soft-fail:false` This will have the command return 0 regardless of the findings, this should ALWAYS be set to false, otherwise you are scanning to see the results, but they will have no impact on the pipeline status. This flag basically disables Checkov.
     * `skip-checks:` This is a list of Checks that we are going to skip, this will completely hide the results for this check
     * `soft-fail-on` Instead of skipping checks, these checks will still run, but even if they fail, Checkov exits 0
       * This is useful for seeing the results of rules such as S3 Versioning or Access Logging without failing the Pipeline
