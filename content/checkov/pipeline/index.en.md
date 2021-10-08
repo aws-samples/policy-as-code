@@ -31,9 +31,8 @@ soft-fail-on:
 ```
 * Run the command again `checkov --directory . --config-file config.yaml`
 * This will permanently silence the error about S3 Bucket Versioning not be enabled and will have Checkov run with a handful of specific flags that we need to review:
-    
-    * `soft-fail:false` This will have the command return 0 regardless of the findings, this should be set to false, otherwise you are scanning to see the results, but they will have no impact on the pipeline status
+* Our organization hasalso  decided that we will never stop S3 Access Logging from letting a Pipeline deploy, but we still want our users see the error, this is the use case for `soft-fail`
+    * `soft-fail:false` This will have the command return 0 regardless of the findings, this should ALWAYS be set to false, otherwise you are scanning to see the results, but they will have no impact on the pipeline status
     * `skip-checks:` This is a list of Checks that we are going to skip, this will completely hide the results for this check
     * `soft-fail-on` Instead of skipping checks, these checks will still run, but even if they fail, Checkov exits 0
       * This is useful for seeing the results of rules such as S3 Versioning or Access Logging without failing the Pipeline
-    
