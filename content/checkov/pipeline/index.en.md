@@ -35,4 +35,5 @@ soft-fail-on:
     * `soft-fail:false` This will have the command return 0 regardless of the findings, this should be set to false, otherwise you are scanning to see the results, but they will have no impact on the pipeline status
     * `skip-checks:` This is a list of Checks that we are going to skip, this will completely hide the results for this check
     * `soft-fail-on` Instead of skipping checks, these checks will still run, but even if they fail, Checkov exits 0
+      * This is useful for seeing the results of rules such as S3 Versioning or Access Logging without failing the Pipeline
     
