@@ -1,0 +1,83 @@
+#
+# Constants
+#
+let controls =  [
+    "NIST-800-53-SC-13"
+]
+
+#
+# Assignments
+#
+let s3_buckets = Resources[ Type == 'AWS::S3::Bucket' ]
+
+rule check_s3_sse_is_enabled when %s3_buckets not empty {
+    %s3_buckets
+        .Properties
+        .BucketEncryption
+        .ServerSideEncryptionConfiguration[*]
+        .ServerSideEncryptionByDefault 
+    {
+            check_s3_sse_kms(this) or 
+            check_s3_sse_aes(this)
+                <<S3 bucket did not have Server Side Encryption turned on>>
+    }
+
+}
+
+rule check_s3_sse_kms(sse_config) {
+    %sse_config {
+         SSEAlgorithm == "aws:kms"
+            <<Algorithm must be set of 'aws:kms'>>
+         KMSMasterKeyID not empty 
+            <<KMS Key must be set>>
+    }
+}
+
+rule check_s3_sse_aes(sse_config) {
+    %sse_config.SSEAlgorithm == "AES256"
+}
+
+rule check_s3_sse_kms_only when %s3_buckets not empty {
+    %s3_buckets
+        .Properties
+        .BucketEncryption
+        .ServerSideEncryptionConfiguration[*]
+        .ServerSideEncryptionByDefault 
+    {
+        check_s3_sse_kms(this)
+            <<S3 bucket did not have Server Side Encryption turned on with only KMS keys>>
+    }
+}
+
+#
+# Assignment
+#
+let kms_keys = Resources[ kms_keys_logical_ids | Type == 'AWS::KMS::Key' ]
+
+rule check_s3_sse_kms_local_stack_only when check_s3_sse_kms_only {
+    %kms_keys not empty 
+        <<There are no KMS keys defined in stack>>
+
+    check_kms_in_local_stack(%s3_buckets)
+}
+
+rule check_kms_in_local_stack(buckets) {
+    when %kms_keys not empty {
+        %buckets
+            .Properties
+            .BucketEncryption
+            .ServerSideEncryptionConfiguration[*]
+            .ServerSideEncryptionByDefault 
+        {
+            KMSMasterKeyID.Ref in %kms_keys_logical_ids 
+                <<KMS key is not 'Ref' referenced locally within same stack>> or 
+            KMSMasterKeyID {
+                'Fn::GetAtt'[0] in %kms_keys_logical_ids
+                    <<KMS Key is not Referenced via 'Fn::GetAtt' for same stack>>
+                'Fn::GetAtt'[1] == 'Arn'
+                    <<Must reference the 'Arn' attribute>>
+            }
+        }
+    }
+}
+

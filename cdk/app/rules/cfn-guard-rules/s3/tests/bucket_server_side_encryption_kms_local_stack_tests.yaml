@@ -1,0 +1,93 @@
+- name: Test S3 bucket SSE set with KMS key Id, local reference, PASS
+  input: 
+    Resources: 
+      kmsKey:
+        Type: AWS::KMS::Key # this isn't valid CFN configuration, just the minimum for test
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          BucketEncryption:
+            ServerSideEncryptionConfiguration:
+              ServerSideEncryptionByDefault:
+                  SSEAlgorithm: aws:kms
+                  KMSMasterKeyID: {Ref: kmsKey}
+  expectations:
+    rules:
+      check_s3_sse_is_enabled: PASS
+      check_s3_sse_kms_only: PASS
+      check_s3_sse_kms_local_stack_only: PASS
+
+- name: Test S3 bucket SSE set with KMS key Id, local reference, PASS
+  input: 
+    Resources: 
+      kmsKey:
+        Type: AWS::KMS::Key # this isn't valid CFN configuration, just the minimum for test
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          BucketEncryption:
+            ServerSideEncryptionConfiguration:
+              ServerSideEncryptionByDefault:
+                  SSEAlgorithm: aws:kms
+                  KMSMasterKeyID: {Fn::GetAtt: [kmsKey, Arn]}
+  expectations:
+    rules:
+      check_s3_sse_is_enabled: PASS
+      check_s3_sse_kms_only: PASS
+      check_s3_sse_kms_local_stack_only: PASS
+
+- name: Test S3 bucket SSE set with KMS key Id, local reference for one
+  input: 
+    Resources: 
+      kmsKey:
+        Type: AWS::KMS::Key # this isn't valid CFN configuration, just the minimum for test
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          BucketEncryption:
+            ServerSideEncryptionConfiguration:
+              ServerSideEncryptionByDefault:
+                  SSEAlgorithm: aws:kms
+                  KMSMasterKeyID: {Ref: kmsKey}
+      s32:
+        Type: AWS::S3::Bucket
+        Properties:
+          BucketEncryption:
+            ServerSideEncryptionConfiguration:
+              ServerSideEncryptionByDefault:
+                  SSEAlgorithm: AES256
+  expectations:
+    rules:
+      check_s3_sse_is_enabled: PASS
+      check_s3_sse_kms_only: FAIL
+      check_s3_sse_kms_local_stack_only: SKIP
+
+- name: Test S3 bucket SSE set with KMS key Id, local reference for one
+  input: 
+    Resources: 
+      kmsKey:
+        Type: AWS::KMS::Key # this isn't valid CFN configuration, just the minimum for test
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          BucketEncryption:
+            ServerSideEncryptionConfiguration:
+              ServerSideEncryptionByDefault:
+                  SSEAlgorithm: aws:kms
+                  KMSMasterKeyID: {Ref: kmsKey}
+      s32:
+        Type: AWS::S3::Bucket
+        Properties:
+          BucketEncryption:
+            ServerSideEncryptionConfiguration:
+              ServerSideEncryptionByDefault:
+                  SSEAlgorithm: aws:kms
+                  KMSMasterKeyID: aws:arn:kms:...
+  expectations:
+    rules:
+      check_s3_sse_is_enabled: PASS
+      check_s3_sse_kms_only: PASS
+      check_s3_sse_kms_local_stack_only: FAIL
+
+
+

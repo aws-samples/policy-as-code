@@ -1,0 +1,48 @@
+#
+# Constants
+#
+let controls = [
+    "NIST-800-53-AC-3",
+    "NIST-800-53-7(21)", 
+    "NIST-800-53-7(29)",
+    "NIST-800-53-AC-4", 
+    "NIST-800-53-AC-6", 
+    "NIST-800-53-AC-21(b)", 
+    "NIST-800-53-SC-7"
+]
+
+#
+# Assigments
+#
+let s3_buckets = Resources[ Type == 'AWS::S3::Bucket' ]
+
+rule deny_s3_access_control {
+    %s3_buckets.Properties.AccessControl not exists
+        <<Do not set legacy AccessControl on S3 buckets>>
+
+}
+
+rule deny_s3_notification_settings {
+    %s3_buckets.Properties.NotificationConfiguration not exists 
+        <<Prevent data exfilteration from being sent to any SNS Topics, SQS Queues or Lambda functions>>
+}
+
+rule deny_s3_cors_settings {
+    %s3_buckets.Properties.CorsConfiguration not exists
+        <<Prevent access to unintended objects due to bucket and object being publicly accessible>>
+}
+
+rule deny_s3_website_configuration {
+    %s3_buckets.Properties.WebsiteConfiguration not exists
+        <<Prevent access to unintended objects due to bucket and object being publicly accessible>>
+}
+
+rule deny_s3_public_access {
+    %s3_buckets.Properties.PublicAccessBlockConfiguration {
+        BlockPublicAcls == true
+        BlockPublicPolicy == true
+        IgnorePublicAcls == true
+        RestrictPublicBuckets == true
+    }
+}
+

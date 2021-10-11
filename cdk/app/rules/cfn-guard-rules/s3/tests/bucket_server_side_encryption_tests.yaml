@@ -1,0 +1,88 @@
+---
+- name: Test no resources 
+  input: 
+    Resources: {}
+  expectations:
+    rules:
+      check_s3_sse_is_enabled: SKIP
+      check_s3_sse_kms_only: SKIP
+      check_s3_sse_kms_local_stack_only: SKIP
+
+- name: Test S3 bucket no SSE set
+  input: 
+    Resources: 
+      s3:
+        Type: AWS::S3::Bucket
+  expectations:
+    rules:
+      check_s3_sse_is_enabled: FAIL
+      check_s3_sse_kms_only: FAIL
+      check_s3_sse_kms_local_stack_only: SKIP
+
+- name: Test S3 bucket SSE set with AES, PASS
+  input: 
+    Resources: 
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          BucketEncryption:
+            ServerSideEncryptionConfiguration:
+              ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+  expectations:
+    rules:
+      check_s3_sse_is_enabled: PASS
+      check_s3_sse_kms_only: FAIL
+      check_s3_sse_kms_local_stack_only: SKIP
+
+- name: Test S3 bucket SSE set with KMS key Id, PASS
+  input: 
+    Resources: 
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          BucketEncryption:
+            ServerSideEncryptionConfiguration:
+              ServerSideEncryptionByDefault:
+                  SSEAlgorithm: aws:kms
+                  KMSMasterKeyID: aws:arn:kms:...
+  expectations:
+    rules:
+      check_s3_sse_is_enabled: PASS
+      check_s3_sse_kms_only: PASS
+      check_s3_sse_kms_local_stack_only: FAIL
+
+- name: Test S3 bucket SSE set not KMS key Id, FAIL
+  input: 
+    Resources: 
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          BucketEncryption:
+            ServerSideEncryptionConfiguration:
+              ServerSideEncryptionByDefault:
+                  SSEAlgorithm: aws:kms
+  expectations:
+    rules:
+      check_s3_sse_is_enabled: FAIL
+      check_s3_sse_kms_only: FAIL
+      check_s3_sse_kms_local_stack_only: SKIP
+
+- name: Test S3 bucket SSE set with empty KMS key Id, FAIL
+  input: 
+    Resources: 
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          BucketEncryption:
+            ServerSideEncryptionConfiguration:
+              ServerSideEncryptionByDefault:
+                  SSEAlgorithm: aws:kms
+                  KMSMasterKeyID: ''
+  expectations:
+    rules:
+      check_s3_sse_is_enabled: FAIL
+      check_s3_sse_kms_only: FAIL
+      check_s3_sse_kms_local_stack_only: SKIP
+
+

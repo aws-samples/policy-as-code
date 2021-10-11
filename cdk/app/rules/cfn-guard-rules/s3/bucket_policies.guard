@@ -1,0 +1,217 @@
+#
+# Constants
+#
+let nist_controls = [
+    "NIST-800-53-SA-8(2)",
+    "NIST-800-53-SC-13"
+]
+
+#
+# Assignments
+#
+let s3_buckets          = Resources[ bucket_name | Type == 'AWS::S3::Bucket' ]
+let s3_bucket_policies  = Resources[ Type == 'AWS::S3::BucketPolicy' ]
+
+#
+# Select all buckets policies that have a Ref. The template might contain
+# policies against an S3 ARN as well, we skip selecting those, hence the
+# some, at-least-one-or-more
+#
+let s3_policy_bucket_refs = some %s3_bucket_policies.Properties.Bucket.Ref
+
+rule check_all_s3_buckets_have_policy when %s3_buckets not empty {
+    #
+    # If there are S3 buckets present, then BucketPolicies MUST be present
+    # in the same stack
+    #
+    %s3_policy_bucket_refs not empty
+        <<Bucket policies must be defined within the same stack template>>
+
+    #
+    # Equality works in this case as there is one-to-one correspondence
+    #
+    %bucket_name == %s3_policy_bucket_refs
+        <<ALL S3 buckets do not have a reference to a policy>>
+}
+
+#
+# ensure the all S3 buckets are accessed via HTTPS
+#
+rule deny_s3_buckets_over_insecure_transport when check_all_s3_buckets_have_policy {
+    #
+    # Select all S3 bucket policies that have a local S3 bucket reference
+    #
+    %s3_bucket_policies[ Properties.Bucket.Ref exists ] {
+        #
+        # Make sure that at-least-one statement has a DENY all s3 actions and principals
+        # for secure transport. Ensure Resource has been correctly referenced.
+        #
+        let name = Properties.Bucket.Ref
+        some Properties.PolicyDocument {
+            when Statement is_struct {
+                check_aws_secure_transport(Statement, %name)
+            } or
+            check_aws_secure_transport(Statement[*], %name)
+
+        }
+    }
+}
+
+#
+# See blog https://aws.amazon.com/blogs/security/how-to-prevent-uploads-of-unencrypted-objects-to-amazon-s3/
+#
+#
+# Look for the policy to contain at-least-one/some Statement that
+# denies (Effect == DENY), s3:PutObject action without encryption
+# To detect encryption is on, it must be statisfy checking HTTP headers
+# to S3 call MUST contain,
+#    s3:x-amz-server-side-encryption-aws-kms-key-id: <kms-arn>
+#    s3:x-amz-server-side-encryption: "aws:kms"
+#    s3:x-amz-server-side-encryption: "AES256"
+#
+rule check_s3_buckets_have_deny_for_unencrypted_puts when check_all_s3_buckets_have_policy {
+    #
+    # For each s3 bucket
+    #
+    %bucket_name {
+        #
+        # Pick the policy that reference this bucket name, it MUST exist
+        #
+        let name = this
+        %s3_bucket_policies[ Properties.Bucket.Ref == %name ] not empty {
+            Properties.PolicyDocument {
+                check_unencrypted_deny_statement(Statement[*]) or
+                check_unencrypted_deny_statement(Statement)
+            }
+        }
+    }
+
+}
+
+
+#
+# Find at-least-one Statement in the PolicyDocument that matches
+#
+rule check_aws_secure_transport(statements, bucket_names) {
+    some %statements {
+        some Action[*] == 's3:*'
+            <<MUST deny all S3 actions>>
+
+        Effect == 'Deny'
+            <<Effect MUST be set to DENY>>
+
+        Principal == '*' or
+        Principal.AWS == '*'
+            <<MUST reject for all Principals. Do not set '*' in additional to other Principals>>
+
+        Condition.Bool."aws:SecureTransport" == "false" or
+        Condition.Bool."aws:SecureTransport" == false
+            <<MUST ensure that "aws:SecureTransport" was set to allow on HTTPS access>>
+
+        check_resource_had_bucket_ref(
+            Resource,
+            %bucket_names
+        )
+    }
+}
+
+
+rule check_unencrypted_deny_statement(statements) {
+    #
+    # Select all DENY statements in the policy and check for Action == 's3:PutObject'
+    # and Principal == '*'
+    #
+    let deny_statements = %statements[ Effect == 'Deny' ]
+
+    %deny_statements not empty
+        << There are no DENY statements in the policy document >>
+
+    # Disabled this rule, don't really understand why it is a failure to just deny s3:PutObject
+    # CDK will generate a bucket policy that has s3:*
+    #some %deny_statements {
+    #    Action == 's3:PutObject'
+    #        << DENY MUST contain only s3:PutObject action and nothing else >>
+
+    some %deny_statements {
+        Principal == '*' or
+        Principal.AWS == '*'
+            << Principal MUST be '*' or {AWS: '*'} for DENY, To keep policy simple do not include others >>
+    }
+
+
+    check_sse(%deny_statements, 's3:x-amz-server-side-encryption', 'AES256', %name)     or
+    check_sse(%deny_statements, 's3:x-amz-server-side-encryption', 'aws:kms', %name)    or
+    check_kms_id(%deny_statements, 's3:x-amz-server-side-encryption-aws-kms-key-id', %name)
+
+}
+
+rule check_kms_id(deny_statements, key, bucket_name) {
+    some %deny_statements {
+        Condition.StringNotEqualsIfExists.%key not empty
+        check_resource_had_bucket_ref(Resource, %bucket_name)
+    } or
+    check_null_string_not_eq_combo(%deny_statements, %key, [], %bucket_name)
+}
+
+rule check_sse(deny_statements, key, value, bucket_name) {
+    some %deny_statements {
+        Condition.StringNotEqualsIfExists.%key in %value
+        check_resource_had_bucket_ref(Resource, %bucket_name)
+    } or
+    check_null_string_not_eq_combo(%deny_statements, %key, %value, %bucket_name)
+}
+
+#
+# For this to work correctly we have check for a combination of 2 independent OR clause
+# statements.
+#
+rule check_null_string_not_eq_combo(deny_statements, key, value, bucket_name) {
+
+    some %deny_statements {
+        when %value not empty {
+            Condition.StringNotEquals.%key in %value
+                << DENY statement does not contain any StringNotEquals Condition to match value >>
+        }
+
+        when %value empty {
+            Condition.StringNotEquals.%key not empty
+                << DENY statement does not contain any StringNotEquals Condition to match value >>
+        }
+
+        #
+        # Longwinded way to say count(Condition) == 1. TODO implement
+        #
+        Condition[ keys != 'StringNotEquals' ] empty
+            << DENY statement must contain only one StringNotEquals key >>
+
+        check_resource_had_bucket_ref(Resource, %bucket_name)
+    }
+
+    some %deny_statements {
+        Condition.Null.%key == true
+            << DENY statement does not contain any Null checks == true >>
+
+        #
+        # Longwinded way to say count(Condition) == 1. TODO implement
+        #
+        Condition[ keys != 'Null' ] empty
+            << DENY statement mut contain only one Null key >>
+
+        check_resource_had_bucket_ref(Resource, %bucket_name)
+    }
+
+}
+
+rule check_resource_had_bucket_ref(resource_inside_statement, bucket_name) {
+    %resource_inside_statement {
+        this is_struct or
+	this is_list
+            << Expecting Intrinsic References or list of struct here >>
+
+        some this.'Fn::Join'[*][*] {
+            Ref in %bucket_name or 
+            'Fn::GetAtt'[0] in %bucket_name
+        } or
+        some this[*].'Fn::GetAtt'[0] in %bucket_name
+    }
+}

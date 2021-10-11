@@ -1,0 +1,113 @@
+---
+- name: all SKIPs
+  input:
+    Resources: {}
+  expectations:
+    rules:
+      deny_s3_access_control: SKIP
+      deny_s3_notification_settings: SKIP
+      deny_s3_cors_settings: SKIP
+      deny_s3_website_configuration: SKIP
+      deny_s3_public_access: SKIP
+
+- name: access control specified FAIL
+  input:
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          AccessControl: Private
+      s32:
+        Type: AWS::S3::Bucket
+      s33:
+        Type: AWS::S3::Bucket
+        Properties:
+          AccessControl: PublicRead
+  expectations:
+    rules:
+      deny_s3_access_control: FAIL
+      deny_s3_notification_settings: PASS
+      deny_s3_cors_settings: PASS
+      deny_s3_website_configuration: PASS
+      deny_s3_public_access: FAIL
+
+- name: Public Access Block + ALL PASS
+  input:
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          PublicAccessBlockConfiguration:
+            BlockPublicAcls: true
+            BlockPublicPolicy: true
+            IgnorePublicAcls: true
+            RestrictPublicBuckets: true
+  expectations:
+    rules:
+      deny_s3_access_control: PASS
+      deny_s3_notification_settings: PASS
+      deny_s3_cors_settings: PASS
+      deny_s3_website_configuration: PASS
+      deny_s3_public_access: PASS
+
+- name: Public Access Block + ALL PASS
+  input:
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          PublicAccessBlockConfiguration:
+            BlockPublicPolicy: true
+            IgnorePublicAcls: true
+            RestrictPublicBuckets: true
+  expectations:
+    rules:
+      deny_s3_access_control: PASS
+      deny_s3_notification_settings: PASS
+      deny_s3_cors_settings: PASS
+      deny_s3_website_configuration: PASS
+      deny_s3_public_access: FAIL
+
+- name: Public Access Block FAIL + ALL PASS
+  input:
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          PublicAccessBlockConfiguration:
+            BlockPublicAcls: false
+            BlockPublicPolicy: true
+            IgnorePublicAcls: true
+            RestrictPublicBuckets: true
+  expectations:
+    rules:
+      deny_s3_access_control: PASS
+      deny_s3_notification_settings: PASS
+      deny_s3_cors_settings: PASS
+      deny_s3_website_configuration: PASS
+      deny_s3_public_access: FAIL
+
+
+- name: Public Access Block + ALL PASS
+  input:
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+        Properties:
+          PublicAccessBlockConfiguration:
+            BlockPublicAcls: true
+            BlockPublicPolicy: true
+            IgnorePublicAcls: true
+            RestrictPublicBuckets: true
+      s32:
+        Type: AWS::S3::Bucket
+        Properties:
+        
+  expectations:
+    rules:
+      deny_s3_access_control: PASS
+      deny_s3_notification_settings: PASS
+      deny_s3_cors_settings: PASS
+      deny_s3_website_configuration: PASS
+      deny_s3_public_access: PASS
+

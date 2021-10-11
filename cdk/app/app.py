@@ -3,9 +3,15 @@ from aws_cdk import (
 )
 import os
 import pathlib
-from stack import Main
-env = core.Environment(account='805159726499', region="us-east-1")
+from s3_deployment import S3AppStack
+
 app = core.App()
-Main(app, "policy-as-code", env=env, description='Peloton Notifier')
+
+S3AppStack(app, "policy-as-code",
+    env=core.Environment(
+        account=os.environ["CDK_DEFAULT_ACCOUNT"],
+        region=os.environ["CDK_DEFAULT_REGION"]
+    ),
+    description='')
 
 app.synth()

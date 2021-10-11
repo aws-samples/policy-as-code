@@ -1,5 +1,5 @@
 ---
-title: "Deploying with a Pipeline"
+title: "The DevSecOps Workflow"
 weight: 80
 ---
-Once you have your policy in code and unit tests to validate correctness, it is time to deploy the infrastructure with a pipeline. This section describes setting up a pipeline for infrastructure validation and deployment.
+This section explores IaC deployment with an AWS CodePipeline. This section also explores using [checkov](https://github.com/bridgecrewio/checkov) and [cfn-guard](https://github.com/aws-cloudformation/cloudformation-guard) as part of a DevSecOps workflow.

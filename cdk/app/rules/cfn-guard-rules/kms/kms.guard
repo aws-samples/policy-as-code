@@ -1,0 +1,35 @@
+#
+# Constants
+#
+let nist_controls = [
+    "NIST-800-53-SA-8(2)"
+]
+
+#
+# Assignment
+#
+let kms_keys = Resources[ Type == 'AWS::KMS::Key' ]
+
+rule deny_kms_key_being_used_outside_account {
+    %kms_keys.Properties.KeyPolicy {
+        check_kms_key_usage_in_account(Statement[*])    or 
+        check_kms_key_usage_in_account(Statement)
+            <<KMS service actions are not DENIED access from outside account explicitly>>
+    }
+}
+
+rule deny_kms_key_without_key_rotation {
+    %kms_keys.Properties.EnableKeyRotation == true
+        <<ALL KMS keys must have auto rotation of key enabled>>
+}
+
+rule check_kms_key_usage_in_account(statements) {
+    some %statements {
+        Effect              == 'Deny'
+        some Resource[*]    == '*'
+        some Principal[*]   == '*' or
+        Principal.AWS == '*'
+        Action              in ['*', 'kms:*']
+        Condition.StringNotEquals.'kms:CallerAccount'.Ref == 'AWS::AccountId'
+    }
+}

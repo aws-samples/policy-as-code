@@ -1,0 +1,123 @@
+---
+- name: empty resources, SKIP
+  input:
+    Resources: {}
+  expectations:
+    rules:
+      deny_kms_key_being_used_outside_account: SKIP
+      deny_kms_key_without_key_rotation: SKIP
+
+- name: no KMS key resources, SKIP
+  input:
+    Resources: 
+      s3:
+        Type: AWS::S3::Bucket
+  expectations:
+    rules:
+      deny_kms_key_being_used_outside_account: SKIP
+      deny_kms_key_without_key_rotation: SKIP
+
+- name: KMS Key, no Deny/enabled, FAIL
+  input:
+    Resources: 
+      kms:
+        Type: AWS::KMS::Key
+        Properties:
+          KeyPolicy:
+            Statement:
+              Effect: Allow # bare minimum to test
+  expectations:
+    rules:
+      deny_kms_key_being_used_outside_account: FAIL
+      deny_kms_key_without_key_rotation: FAIL
+
+- name: KMS Key, no Deny/enabled PASS, FAIL
+  input:
+    Resources: 
+      kms:
+        Type: AWS::KMS::Key
+        Properties:
+          EnableKeyRotation: true
+          KeyPolicy:
+            Statement:
+              Effect: Allow # bare minimum to test
+  expectations:
+    rules:
+      deny_kms_key_being_used_outside_account: FAIL
+      deny_kms_key_without_key_rotation: PASS
+
+- name: KMS Key, no Deny/enabled PASS, FAIL
+  input:
+    Resources: 
+      kms:
+        Type: AWS::KMS::Key
+        Properties:
+          EnableKeyRotation: true
+          KeyPolicy:
+            Statement:
+              Effect: Allow # bare minimum to test
+  expectations:
+    rules:
+      deny_kms_key_being_used_outside_account: FAIL
+      deny_kms_key_without_key_rotation: PASS
+
+
+- name: KMS Key, no Deny/enabled PASS, FAIL
+  input:
+    Resources: 
+      kms:
+        Type: AWS::KMS::Key
+        Properties:
+          EnableKeyRotation: true
+          KeyPolicy:
+            Statement:
+              Effect: Allow # bare minimum to test
+  expectations:
+    rules:
+      deny_kms_key_being_used_outside_account: FAIL
+      deny_kms_key_without_key_rotation: PASS
+
+
+- name: KMS Key, no Deny/enabled PASS
+  input:
+    Resources: 
+      kms:
+        Type: AWS::KMS::Key
+        Properties:
+          EnableKeyRotation: true
+          KeyPolicy:
+            Statement:
+              Effect: Deny
+              Resource: '*'
+              Principal: '*'
+              Action: '*'
+              Condition:
+                StringNotEquals:
+                  kms:CallerAccount: {Ref: 'AWS::AccountId'}
+  expectations:
+    rules:
+      deny_kms_key_being_used_outside_account: PASS
+      deny_kms_key_without_key_rotation: PASS
+
+- name: KMS Key, no Deny only KMS keys /enabled PASS
+  input:
+    Resources: 
+      kms:
+        Type: AWS::KMS::Key
+        Properties:
+          EnableKeyRotation: true
+          KeyPolicy:
+            Statement:
+              Effect: Deny
+              Resource: '*'
+              Principal: '*'
+              Action: 'kms:*'
+              Condition:
+                StringNotEquals:
+                  kms:CallerAccount: {Ref: 'AWS::AccountId'}
+  expectations:
+    rules:
+      deny_kms_key_being_used_outside_account: PASS
+      deny_kms_key_without_key_rotation: PASS
+
+

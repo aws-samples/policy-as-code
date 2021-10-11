@@ -1,0 +1,289 @@
+---
+- name: all SKIPs
+  input:
+    Resources: {}
+  expectations:
+    rules:
+      check_all_s3_buckets_have_policy: SKIP
+      deny_s3_buckets_over_insecure_transport: SKIP
+      check_s3_buckets_have_deny_for_unencrypted_puts: SKIP
+
+- name: FAIL, bucket defined not policy defined
+  input: 
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+  expectations:
+    rules:
+      check_all_s3_buckets_have_policy: FAIL
+      deny_s3_buckets_over_insecure_transport: SKIP
+      check_s3_buckets_have_deny_for_unencrypted_puts: SKIP
+
+- name: FAIL, bucket define, policy defined, not connected
+  input: 
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+      policy:
+        Type: AWS::S3::BucketPolicy
+  expectations:
+    rules:
+      check_all_s3_buckets_have_policy: FAIL
+      deny_s3_buckets_over_insecure_transport: SKIP
+      check_s3_buckets_have_deny_for_unencrypted_puts: SKIP
+
+- name: PASS s3 <-> policy, FAIL policy no deny
+  input: 
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+      policy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+          Bucket: 
+            Ref: s3
+  expectations:
+    rules:
+      check_all_s3_buckets_have_policy: PASS
+      deny_s3_buckets_over_insecure_transport: FAIL
+      check_s3_buckets_have_deny_for_unencrypted_puts: FAIL
+
+- name: PASS s3 <-> policy, PASS DENY policy right
+  input: 
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+      policy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+          Bucket: 
+            Ref: s3
+          PolicyDocument:
+            Statement:
+              Effect: Deny
+              Action: s3:PutObject
+              Principal: '*'
+              Resource: 
+                Fn::Join:
+                  - ""
+                  - [
+                      "aws:arn:s3::/",
+                      {Ref: s3},
+                      "/*"
+                  ]
+              Condition:
+                StringNotEqualsIfExists:
+                  s3:x-amz-server-side-encryption: AES256
+  expectations:
+    rules:
+      check_all_s3_buckets_have_policy: PASS
+      deny_s3_buckets_over_insecure_transport: FAIL
+      check_s3_buckets_have_deny_for_unencrypted_puts: PASS
+
+- name: PASS s3 <-> policy, PASS DENY policy right for AES FnGetAtt
+  input: 
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+      policy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+          Bucket: 
+            Ref: s3
+          PolicyDocument:
+            Statement:
+              Effect: Deny
+              Action: s3:PutObject
+              Principal: '*'
+              Resource: 
+                Fn::Join:
+                  - ""
+                  - [
+                      "aws:arn:s3::/",
+                      {Fn::GetAtt: [s3, 'Arn']},
+                      "/*"
+                  ]
+              Condition:
+                StringNotEqualsIfExists:
+                  s3:x-amz-server-side-encryption: AES256
+  expectations:
+    rules:
+      check_all_s3_buckets_have_policy: PASS
+      deny_s3_buckets_over_insecure_transport: FAIL
+      check_s3_buckets_have_deny_for_unencrypted_puts: PASS
+
+- name: PASS s3 <-> policy, PASS DENY policy right for KMS Key ID
+  input: 
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+      policy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+          Bucket: 
+            Ref: s3
+          PolicyDocument:
+            Statement:
+              Effect: Deny
+              Action: s3:PutObject
+              Principal: '*'
+              Resource: 
+                Fn::Join:
+                  - ""
+                  - [
+                      "aws:arn:s3::/",
+                      {Fn::GetAtt: [s3, 'Arn']},
+                      "/*"
+                  ]
+              Condition:
+                StringNotEqualsIfExists:
+                  s3:x-amz-server-side-encryption-aws-kms-key-id: 'aws:arn:kms:...'
+  expectations:
+    rules:
+      check_all_s3_buckets_have_policy: PASS
+      deny_s3_buckets_over_insecure_transport: FAIL
+      check_s3_buckets_have_deny_for_unencrypted_puts: PASS
+
+- name: PASS s3 <-> policy, FAIL DENY policy right for AES
+  input: 
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+      policy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+          Bucket: 
+            Ref: s3
+          PolicyDocument:
+            Statement:
+              - Effect: Deny
+                Action: s3:PutObject
+                Principal: '*'
+                Resource: 
+                  Fn::Join:
+                    - ""
+                    - [
+                        "aws:arn:s3::/",
+                        {Fn::GetAtt: [s3, 'Arn']},
+                        "/*"
+                    ]
+                Condition:
+                  StringNotEquals:
+                    s3:x-amz-server-side-encryption: AES256
+  expectations:
+    rules:
+      check_all_s3_buckets_have_policy: PASS
+      deny_s3_buckets_over_insecure_transport: FAIL
+      check_s3_buckets_have_deny_for_unencrypted_puts: FAIL
+
+- name: PASS s3 <-> policy, COMBO PASS DENY policy right for AES
+  input: 
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+      policy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+          Bucket: 
+            Ref: s3
+          PolicyDocument:
+            Statement:
+              - Effect: Deny
+                Action: s3:PutObject
+                Principal: '*'
+                Resource: 
+                  Fn::Join:
+                    - ""
+                    - [
+                        "aws:arn:s3::/",
+                        {Fn::GetAtt: [s3, 'Arn']},
+                        "/*"
+                    ]
+                Condition:
+                  StringNotEquals:
+                    s3:x-amz-server-side-encryption: AES256
+              - Effect: Deny
+                Action: s3:PutObject
+                Principal: '*'
+                Resource: 
+                  Fn::Join:
+                    - ""
+                    - [
+                        "aws:arn:s3::/",
+                        {Fn::GetAtt: [s3, 'Arn']},
+                        "/*"
+                    ]
+                Condition:
+                  Null:
+                    s3:x-amz-server-side-encryption: true
+  expectations:
+    rules:
+      check_all_s3_buckets_have_policy: PASS
+      deny_s3_buckets_over_insecure_transport: FAIL
+      check_s3_buckets_have_deny_for_unencrypted_puts: PASS
+
+- name: PASS s3 <-> policy, COMBO PASS DENY policy right for AES
+  input: 
+    Resources:
+      s3:
+        Type: AWS::S3::Bucket
+      policy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+          Bucket: 
+            Ref: s3
+          PolicyDocument:
+            Statement:
+              - Effect: Deny
+                Action: s3:PutObject
+                Principal: '*'
+                Resource: 
+                  Fn::Join:
+                    - ""
+                    - [
+                        "aws:arn:s3::/",
+                        {Fn::GetAtt: [s3, 'Arn']},
+                        "/*"
+                    ]
+                Condition:
+                  StringNotEquals:
+                    s3:x-amz-server-side-encryption: AES256
+              - Effect: Deny
+                Action: s3:PutObject
+                Principal: '*'
+                Resource: 
+                  Fn::Join:
+                    - ""
+                    - [
+                        "aws:arn:s3::/",
+                        {Fn::GetAtt: [s3, 'Arn']},
+                        "/*"
+                    ]
+                Condition:
+                  Null:
+                    s3:x-amz-server-side-encryption: true
+              - Effect: Deny
+                Action: s3:*
+                Principal: '*'
+                Resource: 
+                  Fn::Join:
+                    - ""
+                    - [
+                        "aws:arn:s3::/",
+                        {Fn::GetAtt: [s3, 'Arn']},
+                        "/*"
+                    ]
+                Condition:
+                  Bool:
+                    aws:SecureTransport: false
+
+  expectations:
+    rules:
+      check_all_s3_buckets_have_policy: PASS
+      deny_s3_buckets_over_insecure_transport: PASS
+      check_s3_buckets_have_deny_for_unencrypted_puts: PASS
+
+
+
+
+
