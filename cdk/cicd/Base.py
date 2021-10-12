@@ -18,7 +18,7 @@ class Base(core.Stack):
         # pipeline requires versioned bucket
         bucket = aws_s3.Bucket(
             self, "SourceBucket",
-            bucket_name=f"{props['namespace'].lower()}-{core.Aws.ACCOUNT_ID}",
+            #bucket_name=f"{props['namespace'].lower()}-{core.Aws.ACCOUNT_ID}",
             versioned=True,
             removal_policy=core.RemovalPolicy.DESTROY)
         # ssm parameter to get bucket name later
@@ -50,7 +50,7 @@ class Base(core.Stack):
             build_spec=aws_codebuild.BuildSpec.from_source_filename(
                 filename='cdk/cicd/pipeline_delivery/docker_build_buildspec.yml'),
             environment=aws_codebuild.BuildEnvironment(
-                privileged=True,
+                privileged=False,
                 #build_image=aws_codebuild.LinuxBuildImage.from_ecr_repository(repository=docker_asset.repository, tag=docker_asset.asset_hash)
                 build_image=aws_cdk.aws_codebuild.LinuxBuildImage.from_docker_registry(name='public.ecr.aws/f3n2w4j5/policy-as-code:latest')
             ),
@@ -94,8 +94,17 @@ class Base(core.Stack):
             description="S3 Bucket",
             value=bucket.bucket_name
         )
-        cb_docker_build.role.add_managed_policy(
-            aws_iam.ManagedPolicy.from_aws_managed_policy_name('AdministratorAccess'))
+        # cb_docker_build.role.add_managed_policy(
+        #     aws_iam.ManagedPolicy.from_aws_managed_policy_name('AmazonS3FullAccess'))
+        cb_docker_build.role.add_to_policy(aws_iam.PolicyStatement(
+            effect=aws_iam.Effect.ALLOW,
+            actions=['s3:CreateBucket'],
+            resources=["*"]
+        )
+        )
+
+
+
         self.output_props = props.copy()
         self.output_props['bucket'] = bucket
         self.output_props['cb_docker_build'] = cb_docker_build
