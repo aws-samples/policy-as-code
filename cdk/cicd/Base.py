@@ -34,13 +34,14 @@ class Base(core.Stack):
             repository_name=f"{props['namespace']}",
             removal_policy=core.RemovalPolicy.DESTROY
         )
-        docker_asset = aws_ecr_assets.DockerImageAsset(
-            self, "DockerImage",
-            directory='pipeline_delivery/',
-            exclude=['.git', 'cdk', 'cdk.out'],
 
-            # repository_name=repo_name
-        )
+        # Leaving docker asset here for now but no longer used
+        #docker_asset = aws_ecr_assets.DockerImageAsset(
+        #    self, "DockerImage",
+        #    directory='pipeline_delivery/',
+        #    exclude=['.git', 'cdk', 'cdk.out'],
+        #    # repository_name=repo_name
+        #)
 
         # codebuild project meant to run in pipeline
         cb_docker_build = aws_codebuild.PipelineProject(
