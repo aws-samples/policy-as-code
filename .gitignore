@@ -1,2 +1,3 @@
 **/cdk/*/cdk.out/*
 **/cdk/*/*pycache*
+**.DS_store**
