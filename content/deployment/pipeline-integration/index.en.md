@@ -88,10 +88,15 @@ aws codecommit get-repository --repository-name ${repo} --query 'repositoryMetad
 ```
 git remote add origin https://git-codecommit.us-east-2.amazonaws.com/v1/repos/policy-as-code-<stack_id>
 ```
-4. Push the repo
+4. Make sure that you have the git-remote-codecommit python package installed. This help with authenticating with CodeCommit.
+:::code{showCopyAction=true}
+pip install git-remote-codecommit
+:::
+5. Push the repo
 :::code{showCopyAction=true showLineNumbers=false}
 git push --set-upstream origin main
 :::
+6. View your CodePipeline in your account. Instructions to do that is [here](https://docs.aws.amazon.com/codepipeline/latest/userguide/pipelines-view-console.html#pipelines-list-console.)
 
 :::code{showCopyAction=true showLineNumbers=false}
         kms_key = aws_kms.Key(self, 'KmsKey',

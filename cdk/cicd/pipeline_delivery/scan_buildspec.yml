@@ -7,7 +7,8 @@ phases:
       - rm -rf .python-version
   build:
     commands:
-      - checkov --directory cdk.out --config-file checkov-config.yml
+      - checkov --directory cdk.out --config-file ./rules/checkov/checkov-config.yml
+      - cfn-guard validate -d cdk.out/policy-as-code.template.json -r ./rules/cfn-guard-rules
 artifacts:
   name: scanned_source
   packaging: zip
