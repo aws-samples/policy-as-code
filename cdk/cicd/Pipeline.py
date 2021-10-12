@@ -16,7 +16,7 @@ class Pipeline(core.Stack):
         synth = aws_codepipeline.Artifact(artifact_name='synth')
         scanned_source = aws_codepipeline.Artifact(artifact_name='scanned_source')
         # define the pipeline
-        repo = aws_codecommit.Repository(self, "sourcerepo", repository_name='policy-as-code')
+        repo = aws_codecommit.Repository(self, "sourcerepo", repository_name='policy-as-code', description='Policy as Code Mirror')
         change_set_name = 'policy-as-code'
         pipeline = aws_codepipeline.Pipeline(
             self, "Pipeline",

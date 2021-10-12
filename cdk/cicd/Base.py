@@ -29,18 +29,18 @@ class Base(core.Stack):
             description='cdk pipeline bucket'
         )
         # ecr repo to push docker container into
-        ecr = aws_ecr.Repository(
-            self, "ECR",
-            repository_name=f"{props['namespace']}",
-            removal_policy=core.RemovalPolicy.DESTROY
-        )
-        docker_asset = aws_ecr_assets.DockerImageAsset(
-            self, "DockerImage",
-            directory='pipeline_delivery/',
-            exclude=['.git', 'cdk', 'cdk.out'],
-
-            # repository_name=repo_name
-        )
+        # ecr = aws_ecr.Repository(
+        #     self, "ECR",
+        #     repository_name=f"{props['namespace']}",
+        #     removal_policy=core.RemovalPolicy.DESTROY
+        # )
+        # docker_asset = aws_ecr_assets.DockerImageAsset(
+        #     self, "DockerImage",
+        #     directory='pipeline_delivery/',
+        #     exclude=['.git', 'cdk', 'cdk.out'],
+        #
+        #     # repository_name=repo_name
+        # )
 
         # codebuild project meant to run in pipeline
         cb_docker_build = aws_codebuild.PipelineProject(
@@ -56,8 +56,6 @@ class Base(core.Stack):
 
             # pass the ecr repo uri into the codebuild project so codebuild knows where to push
             environment_variables={
-                'ecr': aws_codebuild.BuildEnvironmentVariable(
-                    value=ecr.repository_uri),
                 'tag': aws_codebuild.BuildEnvironmentVariable(
                     value='cdk')
             },
@@ -78,8 +76,6 @@ class Base(core.Stack):
             ),
             # pass the ecr repo uri into the codebuild project so codebuild knows where to push
             environment_variables={
-                'ecr': aws_codebuild.BuildEnvironmentVariable(
-                    value=ecr.repository_uri),
                 'tag': aws_codebuild.BuildEnvironmentVariable(
                     value='cdk')
             },
@@ -91,13 +87,7 @@ class Base(core.Stack):
         bucket.grant_read_write(cb_docker_build)
 
         # codebuild permissions to interact with ecr
-        ecr.grant_pull_push(cb_docker_build)
 
-        core.CfnOutput(
-            self, "ECRURI",
-            description="ECR URI",
-            value=ecr.repository_uri,
-        )
         core.CfnOutput(
             self, "S3Bucket",
             description="S3 Bucket",
