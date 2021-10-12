@@ -16,7 +16,7 @@ class Pipeline(core.Stack):
         synth = aws_codepipeline.Artifact(artifact_name='synth')
         scanned_source = aws_codepipeline.Artifact(artifact_name='scanned_source')
         # define the pipeline
-        repo = aws_codecommit.Repository(self, "sourcerepo", repository_name='policy-as-code-' + self.stack_id)
+        repo = aws_codecommit.Repository(self, "sourcerepo", repository_name='policy-as-code')
         change_set_name = 'policy-as-code'
         pipeline = aws_codepipeline.Pipeline(
             self, "Pipeline",
@@ -37,7 +37,7 @@ class Pipeline(core.Stack):
                         aws_codepipeline_actions.CodeCommitSourceAction(
                             repository=repo,
                             action_name='source',
-                            branch='dev',
+                            branch='main',
                             output=source_output,
                             trigger=aws_codepipeline_actions.CodeCommitTrigger.EVENTS
 
