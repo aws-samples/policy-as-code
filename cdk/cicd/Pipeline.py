@@ -5,6 +5,7 @@ from aws_cdk import (
     aws_codecommit,
     core,
     aws_cloudformation,
+    aws_secretsmanager,
 )
 
 
@@ -12,12 +13,14 @@ class Pipeline(core.Stack):
     def __init__(self, app: core.App, id: str, props, **kwargs) -> None:
         super().__init__(app, id, **kwargs)
         # define the s3 artifact
-        source_output = aws_codepipeline.Artifact(artifact_name='source')
+        ccout = aws_codepipeline.Artifact(artifact_name='ccout')
+        pl = aws_codepipeline.Artifact(artifact_name='pl_infra')
         synth = aws_codepipeline.Artifact(artifact_name='synth')
         scanned_source = aws_codepipeline.Artifact(artifact_name='scanned_source')
         # define the pipeline
         repo = aws_codecommit.Repository(self, "sourcerepo", repository_name='policy-as-code-' + self.stack_id)
         change_set_name = 'policy-as-code'
+        github_secret = aws_secretsmanager.Secret.from_secret_name_v2(self, 'secret', secret_name='/github/josjaf')
         pipeline = aws_codepipeline.Pipeline(
             self, "Pipeline",
             pipeline_name=f"{props['namespace']}",
@@ -31,16 +34,26 @@ class Pipeline(core.Stack):
                         #     bucket_key='source.zip',
                         #     action_name='S3Source',
                         #     run_order=1,
-                        #     output=source_output,
+                        #     output=ccout,
                         #     trigger=aws_codepipeline_actions.S3Trigger.POLL
                         # ),
                         aws_codepipeline_actions.CodeCommitSourceAction(
                             repository=repo,
                             action_name='source',
                             branch='dev',
-                            output=source_output,
+                            output=ccout,
                             trigger=aws_codepipeline_actions.CodeCommitTrigger.EVENTS
 
+
+                        ),
+                        aws_codepipeline_actions.GitHubSourceAction(
+                            repo='policy-as-code-pipeline',
+                            owner='josjaf',
+                            oauth_token=github_secret.secret_value,
+                            action_name='gh',
+                            branch='master',
+                            output=pl,
+                            trigger=aws_codepipeline_actions.GitHubTrigger.WEBHOOK
 
                         )
                     ]
@@ -50,7 +63,8 @@ class Pipeline(core.Stack):
                     actions=[
                         aws_codepipeline_actions.CodeBuildAction(
                             action_name='Synth',
-                            input=source_output,
+                            input=pl,
+                            extra_inputs=[ccout],
                             outputs=[synth],
                             project=props['cb_docker_build'],
                             run_order=1,
