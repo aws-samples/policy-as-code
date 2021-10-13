@@ -8,7 +8,7 @@ phases:
   build:
     commands:
       - checkov --directory cdk.out --config-file ./rules/checkov/checkov-config.yml
-      - cfn-guard validate -d cdk.out/policy-as-code.template.json -r ./rules/cfn-guard-rules
+      - cfn-guard validate -d cdk.out/policy-as-code.template.json -r ./rules/cfn-guard
 artifacts:
   name: scanned_source
   packaging: zip
