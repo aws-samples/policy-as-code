@@ -208,7 +208,7 @@ Check: CKV_AWS_19: "Ensure the S3 bucket has server-side-encryption enabled"
                 5  |       "Properties": {
    ...
    ```
-1. The enabling encryption of data written to the S3 bucket. Open the file **cdk.out/policy-as-code.template.json** in Cloud9.
+1. The enabling encryption of data written to the S3 bucket. Open the file **cdk.out/policy-as-code.template.json** in Cloud9. Remember that since we are using a CDK app to create this CloudFormation template, you should edit the CDK App instead of the Rendered CloudFormation. 
     ```
     ...
     "Bucket83908E77": {
