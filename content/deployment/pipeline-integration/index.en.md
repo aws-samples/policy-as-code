@@ -208,7 +208,7 @@ Check: CKV_AWS_19: "Ensure the S3 bucket has server-side-encryption enabled"
                 5  |       "Properties": {
    ...
    ```
-1. The enabling encryption of data written to the S3 bucket. Open the file **cdk.out/policy-as-code.template.json** in Cloud9. Remember that since we are using a CDK app to create this CloudFormation template, you should edit the CDK App instead of the Rendered CloudFormation. 
+1. To enable server-side-encryption encryption of the S3 bucket, open the file **cdk.out/policy-as-code.template.json** in Cloud9. Remember that since we are using a CDK app to create this CloudFormation template, you should edit the CDK App instead of the Rendered CloudFormation. 
     ```
     ...
     "Bucket83908E77": {
@@ -334,6 +334,13 @@ Check: CKV_AWS_19: "Ensure the S3 bucket has server-side-encryption enabled"
     ![LinkExecutionDetail](/static/LinkExecutionDetails.png)
 1. The S3 deployment is running into issues with cfn-guard. The next section will look into fixing the issues and validating that S3 compliance with the cfn-guard rules.
 
+## Fixing CDK/CFN Template for cfn-guard rules violations
+1. As from before replicate cfn-guard run in the local environment. Run the following commands to do that:
+    :::code{showCopyAction=true showLineNumbers=false}
+    cd ~/environment/policy-as-code/cdk/app;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json
+    :::
+1. foo
+1. bar
 
 
 
