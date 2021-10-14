@@ -64,7 +64,7 @@ Resources:
     * CKV_AWS_21
     * CKV_AWS_55
     * CKV_AWS_56
-* Checkov results usually include a range of risk you are mitigating, but there is no way to filter by risk
+* The risks from Checkov findings can have a significant range from a suggestion that doesn't apply most of the time such as S3 Access Logging all the way to a dangerous IAM Admin policy. Unfortunately, there is no way to filter by risk level in Checkov.
     * For example: This S3 Bucket does not include Versioning or Access Logging - these are optional features that do not always need to be enabled
     * This S3 Bucket also does not include the block to Disable Public Access, which your organization may require
 * Your organization will need to determine which failed checks to ignore and let the pipeline proceed and which checks that must be resolved
@@ -82,7 +82,7 @@ Resources:
   
 
 ### Conclusion
-* Determining which checks to fail your pipeline on is much easier than writing the rules that Checkov has already implemented from scratch.
+* Determining which checks to fail your pipeline on is much easier than writing the rules that Checkov has already implemented from scratch. 
 * You can write your own custom Checkov rules - they are written in Python. Checkov regulary accepts Pull Requests on the public repo, but this is not required to integrate your custom checks. 
-* Checkov might not be your preferred tool to write new checks for, but it has such a large existing rulespace and is well maintained that it makes sense to include it in most CloudFormation and Terraform Pipelines
-* Here is a [simple example](https://github.com/bridgecrewio/checkov/pull/1546/commits/68adc6f9e5c45a7cf7981b626efdc5d0ac301eab) of a pull request that has been merged to check for Lambda environment variable encryption if a KMS Key is provided
+* Checkov might not be your preferred tool or language to write new checks for, but it has such a large existing rulespace and is well maintained that it makes sense to include it in most CloudFormation and Terraform Pipelines
+* Here is a [simple example](https://github.com/bridgecrewio/checkov/pull/1546/commits/68adc6f9e5c45a7cf7981b626efdc5d0ac301eab) of a pull request that has been merged to check for Lambda environment variable encryption if a KMS Key is provided. This will give you an example of a simple rule in Python.
