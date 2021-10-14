@@ -1,5 +1,5 @@
 ---
-title: "Installing Open Policy Agent"
+title: "Open Policy Agent - Optional"
 weight: 13
 ---
 The following steps describe how to install the Open Policy Agent (opa) cli. </br>
