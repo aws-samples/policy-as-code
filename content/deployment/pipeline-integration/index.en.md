@@ -1,5 +1,5 @@
 ---
-title: "Policy as Code pipeline"
+title: "DevSecOps Workflow - Shift Left"
 weight: 61
 ---
 
