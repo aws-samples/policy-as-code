@@ -1,5 +1,5 @@
 ---
-title: "The DevSecOps Workflow"
+title: "Policy as Code in Action"
 weight: 80
 ---
-This section explores IaC deployment with an AWS CodePipeline. This section also explores using [checkov](https://github.com/bridgecrewio/checkov) and [cfn-guard](https://github.com/aws-cloudformation/cloudformation-guard) as part of a DevSecOps workflow.
+Policy as code can be implemented thoughout the lifecycle of a workload. It can be preventative, detective, or both. This section explores implementing policy as code throughout the lifecycle of a workload.
