@@ -4,7 +4,7 @@ weight: 61
 ---
 
 ## Overview
-This section will explore using policy as code tools to provide guardrails for IaC deployments. Policy as Code tools serve as gatekeepers to resource deployments that do not comply
+This section will explore using policy as code as a preventative measure. It will provide guardrails for IaC deployments. Policy as Code tools serve as gatekeepers to resource deployments that do not comply
 with the policies an organization has established. There are many CI/CD tools that can be used to implement this workflow but for this workshop AWS CodePipeline will be used. The
 concepts used here would be applicable to any CI/CD tool.
 
