@@ -1,5 +1,5 @@
 ---
-title: "DevSecOps Workflow - Shift Left"
+title: "DevSecOps Workflow"
 weight: 61
 ---
 
@@ -61,13 +61,13 @@ The environment needs to have the following tools installed.
     cd environment;git clone https://github.com/aws-samples/policy-as-code.git
     :::
 1. Install the AWS CodePipeline as follows:
-:::code{showCopyAction=true showLineNumbers=false}
-cd ~/environment/policy-as-code/cdk/cicd
-pip install -r requirements.txt
-cdk bootstrap
-cdk deploy --all
-:::
-13. Answer 'y' to all prompts.
+    ```
+    cd ~/environment/policy-as-code/cdk/cicd
+    pip install -r requirements.txt
+    cdk bootstrap
+    cdk deploy --all
+    ```
+1. Answer 'y' to all prompts.
 1. Remove AdministratorAccess from the IAM role **PolicyAsCodeRole**.
 
 ### AWS Hosted Event
@@ -80,61 +80,60 @@ To kickoff the deployment use git push to AWS CodeCommit which is the source for
 changed to comply with the rules specified in the AWS CodePipeline. Do the following:
 
 1. Clone the workshop repo (If this is not already done.):
-:::code{showCopyAction=true showLineNumbers=false}
-cd ~/environment
-git clone https://github.com/aws-samples/policy-as-code.git
-:::
-2. Remove the reference to the upstream code repo by issuing the command:
-:::code{showCopyAction=true showLineNumbers=false}
-git remote remove origin
-:::
-3. Get the repository clone URL by running the the following commands and adding it as our remote origin:
-:::code{showCopyAction=true showLineNumbers=false}
-export repo=$(aws codecommit list-repositories --output text | awk '{print $3}' | grep policy-as-code)
-export codecommiturl=$(aws codecommit get-repository --repository-name ${repo} --query 'repositoryMetadata.cloneUrlHttp' --output text)
-git remote add origin ${codecommiturl}
-:::
-4. Make sure that you have the git-remote-codecommit python package installed. This helps with authenticating with CodeCommit.
-:::code{showCopyAction=true}
-pip install git-remote-codecommit
-:::
-5. Push the repo
-:::code{showCopyAction=true showLineNumbers=false}
-git push --set-upstream origin main
-:::
-6. View the CodePipeline in your account. Instructions to do that is [here](https://docs.aws.amazon.com/codepipeline/latest/userguide/pipelines-view-console.html#pipelines-list-console.). Give it about a minute to restart. Initially the Pipeline will have failed because when deployed for the first time there was nothing in the CodeCommit repo.
-7. Your CodePipeline will fail on the stage **ScanDeploy** stage. Click on the **Details** on the Scan - AWS CodeBuild.
-![ScanDeployFailed](/static/ScanDeployFailed.png)
-8. You'll get a pop box that looks like below. Click on **Link to execution details**:
-![LinkExecutionDetail](/static/LinkExecutionDetails.png)
-9. This should bring you to the CodeBuild project. The two failures look like this:
-```
-Check: CKV_AWS_53: "Ensure S3 bucket has block public ACLS enabled"
-    FAILED for resource: AWS::S3::Bucket.Bucket83908E77
-    File: /policy-as-code.template.json:3-50
-    Guide: https://docs.bridgecrew.io/docs/bc_aws_s3_19
+    :::code{showCopyAction=true showLineNumbers=false}
+    cd ~/environment/policy-as-code
+    :::
+1. Remove the reference to the upstream code repo by issuing the command:
+    :::code{showCopyAction=true showLineNumbers=false}
+    git remote remove origin
+    :::
+1. Get the repository clone URL by running the the following commands and adding it as our remote origin:
+    ```
+    export repo=$(aws codecommit list-repositories --output text | awk '{print $3}' | grep policy-as-code)
+    export codecommiturl=$(aws codecommit get-repository --repository-name ${repo} --query 'repositoryMetadata.cloneUrlHttp'    --output text)
+    git remote add origin ${codecommiturl}
+    ```
+1. Make sure that you have the git-remote-codecommit python package installed. This helps with authenticating with CodeCommit.
+    :::code{showCopyAction=true}
+    pip install git-remote-codecommit
+    :::
+1. Push the repo
+    :::code{showCopyAction=true showLineNumbers=false}
+    git push --set-upstream origin main
+    :::
+1. View the CodePipeline in your account. Instructions to do that is [here](https://docs.aws.amazon.com/codepipeline/latest/userguide/pipelines-view-console.html#pipelines-list-console.). Give it about a minute to restart. Initially the Pipeline will have failed because when deployed for the first time there was nothing in the CodeCommit repo.
+1. Your CodePipeline will fail on the stage **ScanDeploy** stage. Click on the **Details** on the Scan - AWS CodeBuild.
+    ![ScanDeployFailed](/static/ScanDeployFailed.png)
+1. You'll get a pop box that looks like below. Click on **Link to execution details**:
+    ![LinkExecutionDetail](/static/LinkExecutionDetails.png)
+1. This should bring you to the CodeBuild project. The two failures look like this:
+    ```
+    Check: CKV_AWS_53: "Ensure S3 bucket has block public ACLS enabled"
+        FAILED for resource: AWS::S3::Bucket.Bucket83908E77
+        File: /policy-as-code.template.json:3-50
+        Guide: https://docs.bridgecrew.io/docs/bc_aws_s3_19
 
-        3  |     "Bucket83908E77": {
-        4  |       "Type": "AWS::S3::Bucket",
-        5  |       "Properties": {
-...
-        29 |         "PublicAccessBlockConfiguration": {
-        30 |           "BlockPublicAcls": false,
-        31 |           "BlockPublicPolicy": true,
-        32 |           "IgnorePublicAcls": true,
-        33 |           "RestrictPublicBuckets": true
-```
-```
-Check: CKV_AWS_19: "Ensure the S3 bucket has server-side-encryption enabled"
-    FAILED for resource: AWS::S3::Bucket.Bucket83908E77
-    File: /policy-as-code.template.json:3-50
-    Guide: https://docs.bridgecrew.io/docs/s3_14-data-encrypted-at-rest
+            3  |     "Bucket83908E77": {
+            4  |       "Type": "AWS::S3::Bucket",
+            5  |       "Properties": {
+    ...
+            29 |         "PublicAccessBlockConfiguration": {
+            30 |           "BlockPublicAcls": false,
+            31 |           "BlockPublicPolicy": true,
+            32 |           "IgnorePublicAcls": true,
+            33 |           "RestrictPublicBuckets": true
+    ```
+    ```
+    Check: CKV_AWS_19: "Ensure the S3 bucket has server-side-encryption enabled"
+        FAILED for resource: AWS::S3::Bucket.Bucket83908E77
+        File: /policy-as-code.template.json:3-50
+        Guide: https://docs.bridgecrew.io/docs/s3_14-data-encrypted-at-rest
 
-        3  |     "Bucket83908E77": {
-        4  |       "Type": "AWS::S3::Bucket",
-        5  |       "Properties": {
-```
-10. The S3 deployment is running into issues with checkov. The next section will look into fixing the issues and validating that S3 compliance with the checkov rules.
+            3  |     "Bucket83908E77": {
+            4  |       "Type": "AWS::S3::Bucket",
+            5  |       "Properties": {
+    ```
+1. The S3 deployment is running into issues with checkov. The next section will look into fixing the issues and validating that S3 compliance with the checkov rules.
 
 ## Fixing CDK/CFN Template for Checkov rules violations
 1. The two issues flagged by [checkov](https://github.com/bridgecrewio/checkov) are as follows:
@@ -817,25 +816,27 @@ Check: CKV_AWS_19: "Ensure the S3 bucket has server-side-encryption enabled"
 
 ## CodePipeline Cleanup
 1. Attach the AWS Managed IAM policy AdministratorAccess to the IAM role **PolicyAsCodeRole**.
-2. Change directory to the S3 CDK application:
+1. Change directory to the S3 CDK application:
     :::code{showCopyAction=true showLineNumbers=false}
     cd ~/environment/policy-as-code/cdk/app
     :::
-3. Destroy the S3 CDK application by running:
+1. Destroy the S3 CDK application by running:
     :::code{showCopyAction=true showLineNumbers=false}
-    cdk destroy
+    cdk destroy --all
     :::
     Answer 'y' to any prompts.
-4. Change directory to the CodePipeline CDK application:
+1. Change directory to the CodePipeline CDK application:
     :::code{showCopyAction=true showLineNumbers=false}
     cd ~/environment/policy-as-code/cdk/cicd
     :::
-5. Destroy the CodePipeline CDK application:
+1. Remove pac-base S3 bucket.
+    ```
+    export s3_bucket=$(aws s3 ls | grep 'pac-base-sourcebucket' | awk '{print $3}')
+    aws s3 rm --recursive s3://${s3_bucket}
+    aws s3 rb --force s3://${s3_bucket}
+    ```
+1. Destroy the CodePipeline CDK application:
     :::code{showCopyAction=true showLineNumbers=false}
-    cdk destroy pac-pipeline
+    cdk destroy --all
     :::
-    Answer 'y' to all prompts (don't use --all with destroy as the pac-pipeline needs to be deleted first.)
-6. Destroy the pac artificats by running
-    :::code{showCopyAction=true showLineNumbers=false}
-    cdk destroy pac
-    :::
+    Answer 'y' to all prompts.

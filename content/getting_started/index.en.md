@@ -29,19 +29,35 @@ The environment needs to have the following tools installed.
     ```
 1. Increase the volume size of your Cloud9 instance specified [here](https://docs.aws.amazon.com/cloud9/latest/user-guide/move-environment.html#move-environment-resize).
 1. checkov - [Installing Checkov](/checkov/install-checkov)
+    :::code{showCopyAction=true showLineNumbers=false}
+    pip3 install checkov
+    :::
+1. Install [Rust](https://www.rust-lang.org/tools/install)
+    :::code{showCopyAction=true showLineNumbers=false}
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh;source ~/.bash_profile
+    :::
+    Choose "1) Proceed with installation (default)" or hit enter.
 1. cfn-guard - [Installing cfn-guard](https://github.com/aws-cloudformation/cloudformation-guard#installation)
+    ```
+    git clone https://github.com/dchakrav-github/cloudformation-guard
+    cd cloudformation-guard
+    git switch parameterized-rules
+    cargo build --release
+    mkdir -p ~/bin;cp ./target/release/cfn-guard ~/bin
+    cfn-guard --version
+    ```
 1. Clone the policy-as-code repository from github in the environment directory:
     :::code{showCopyAction=true showLineNumbers=false}
-    cd environment;git clone https://github.com/aws-samples/policy-as-code.git
+    cd ~/environment;git clone https://github.com/aws-samples/policy-as-code.git
     :::
 1. Install the AWS CodePipeline as follows:
-:::code{showCopyAction=true showLineNumbers=false}
-cd ~/environment/policy-as-code/cdk/cicd
-pip install -r requirements.txt
-cdk bootstrap
-cdk deploy --all
-:::
-13. Answer 'y' to all prompts.
+    ```
+    cd ~/environment/policy-as-code/cdk/cicd
+    pip install -r requirements.txt
+    cdk bootstrap
+    cdk deploy --all
+    ```
+1. Answer 'y' to all prompts.
 1. Remove AdministratorAccess from the IAM role **PolicyAsCodeRole**.
 
 ### AWS Hosted Event
