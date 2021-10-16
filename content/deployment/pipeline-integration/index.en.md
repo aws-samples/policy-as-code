@@ -209,7 +209,7 @@ changed to comply with the rules specified in the AWS CodePipeline. Do the follo
                 5  |       "Properties": {
    ...
    ```
-1. To enable server-side-encryption encryption of the S3 bucket, open the file **cdk.out/policy-as-code.template.json** in Cloud9. Remember that since we are using a CDK app to create this CloudFormation template, you should edit the CDK App instead of the Rendered CloudFormation. 
+1. To enable server-side-encryption encryption of the S3 bucket, open the file **cdk.out/policy-as-code.template.json** in Cloud9. Remember that since we are using a CDK app to create this CloudFormation template, you should edit the CDK App instead of the Rendered CloudFormaœtion. 
     ```
     ...
     "Bucket83908E77": {

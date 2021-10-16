@@ -16,11 +16,7 @@ We strongly suggest you checkout:
 pip install cfn-lint
 ```
 
-###Docker
-```bash
-git clone https://github.com/aws-cloudformation/cfn-lint
-docker build --tag cfn-python-lint:latest .
-```
+
 
 ### Verify CFN Lint Installation
 Check to see that you can run the cli for cfn-lint on your terminal.
