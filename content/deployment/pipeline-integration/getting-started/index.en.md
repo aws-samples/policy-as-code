@@ -1,6 +1,6 @@
 ---
 title: "Getting Started"
-weight: 20
+weight: 10
 ---
 
 This section covers setting up your environment to work through the examples in this workshop. Deploying an [AWS Cloud9 environment](https://docs.aws.amazon.com/cloud9/latest/user-guide/welcome.html) will make setting this up a lot easier.
