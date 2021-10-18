@@ -19,7 +19,7 @@ class Base(core.Stack):
         bucket = aws_s3.Bucket(
             self, "SourceBucket",
             #bucket_name=f"{props['namespace'].lower()}-{core.Aws.ACCOUNT_ID}",
-            versioned=False,
+            versioned=True,
             removal_policy=core.RemovalPolicy.DESTROY)
         # ssm parameter to get bucket name later
         bucket_param = aws_ssm.StringParameter(
