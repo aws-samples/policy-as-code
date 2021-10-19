@@ -19,9 +19,10 @@ weight: 50
     :::
 1. Remove pac-base S3 bucket.
     ```
+    cd ~/environment/policy-as-code/utils
+    pip install boto3
     export s3_bucket=$(aws s3 ls | grep 'pac-base-sourcebucket' | awk '{print $3}')
-    aws s3 rm --recursive s3://${s3_bucket}
-    aws s3 rb --force s3://${s3_bucket}
+    python3 ./s3_force_delete.py ${s3_bucket}
     ```
 1. Destroy the CodePipeline CDK application:
     :::code{showCopyAction=true showLineNumbers=false}
