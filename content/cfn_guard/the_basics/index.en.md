@@ -62,7 +62,7 @@ One thing to note is the '*' would normally retrieve all the Resources in a Clou
 Let's run our validation to look at the results. Issue the following command:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clause.guard
+cfn-guard validate -d rds_demo.yaml -r clause.guard -—show-summary all
 :::
 
 You'll get an output like this:
@@ -83,7 +83,7 @@ Resources.*.Properties.DBInstanceClass IN ['db.m5.large', 'db.m5.xlarge']
 Let's validate:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clause.guard
+cfn-guard validate -d rds_demo.yaml -r clause.guard -—show-summary all
 :::
 ```
 rds_demo.yaml Status = PASS
@@ -103,7 +103,7 @@ Resources.*.Properties.AllocatedStorage IN r[100, 1000]
 Running the validation:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clause.guard
+cfn-guard validate -d rds_demo.yaml -r clause.guard -—show-summary all
 :::
 ```
 rds_demo.yaml Status = PASS
@@ -131,7 +131,7 @@ Resources.*.Properties.StorageEncrypted exists
 Running the validation again should yield something simliar to this:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clause.guard
+cfn-guard validate -d rds_demo.yaml -r clause.guard -—show-summary all
 :::
 ```
 rds_demo.yaml Status = PASS
@@ -151,7 +151,7 @@ Resources.*.Properties.StorageEncrypted == true
 Let's run our validation:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clauses.guard
+cfn-guard validate -d rds_demo.yaml -r clauses.guard -—show-summary all
 :::
 ```
 rds_demo.yaml Status = FAIL
@@ -177,7 +177,7 @@ Resources.*.Properties.StorageEncrypted == true
 Let's run the validation:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clauses.guard
+cfn-guard validate -d rds_demo.yaml -r clauses.guard -—show-summary all
 :::
 ```
 rds_demo.yaml Status = FAIL
@@ -214,7 +214,7 @@ Resources:
 Running our validation again:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clauses.guard
+cfn-guard validate -d rds_demo.yaml -r clauses.guard -—show-summary all
 :::
 ```
 rds_demo.yaml Status = PASS
@@ -293,7 +293,7 @@ Resources.*.Properties {
 As always we should validate our template to make sure the rules file is syntactically correct:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clauses.guard
+cfn-guard validate -d rds_demo.yaml -r clauses.guard -—show-summary all
 :::
 ```
 rds_demo.yaml Status = PASS
@@ -322,7 +322,7 @@ when Resources.*.Type == 'AWS::RDS::DBInstance' {
 The **when** statement will ensure that we only check resources of type 'AWS::RDS::DBInstance'. Once updated let's run our validation:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clauses.guard
+cfn-guard validate -d rds_demo.yaml -r clauses.guard -—show-summary all
 :::
 ```
 rds_demo.yaml Status = PASS
@@ -376,7 +376,7 @@ rule allowed_rds_properties when Resources.*.Type == 'AWS::RDS::DBInstance' {
 Again, let's validate our template:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clauses.guard
+cfn-guard validate -d rds_demo.yaml -r clauses.guard --show-summary all
 :::
 ```
 rds_demo.yaml Status = PASS

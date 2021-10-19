@@ -27,7 +27,7 @@ The environment needs to have the following tools installed.
     Default region name [None]: us-east-2 or whatever your actual region is.
     Default output format [None]:
     ```
-1. Increase the volume size of your Cloud9 instance specified [here](https://docs.aws.amazon.com/cloud9/latest/user-guide/move-environment.html#move-environment-resize).
+1. Increase the volume size to 100GB in your Cloud9 instance specified [here](https://docs.aws.amazon.com/cloud9/latest/user-guide/move-environment.html#move-environment-resize).
 1. checkov - [Installing Checkov](/checkov/install-checkov)
     :::code{showCopyAction=true showLineNumbers=false}
     pip3 install checkov
