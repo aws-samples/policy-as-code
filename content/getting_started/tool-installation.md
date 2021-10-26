@@ -1,5 +1,9 @@
 ---
-title: "Installing cfn-guard 2.0"
+title: "Installing the tools"
 weight: 40
 ---
-This section provides instruction on installation of cfn-guard 2.0
+Refer to the sections that address specific tools of interest:
+- [AWS CloudFormation Guard Installation](/cfn-guard/cfn-guard-install)
+- [Regula/Open Policy Agent Installation](/opa/regula-install)
+- [Checkov Installation](/checkov/install-checkov)
+- [Cfn Lint Installation](/cfn-lint/install-cfn-lint)
