@@ -10,7 +10,7 @@ pip3 install checkov
 ```
 
 ### Docker
-* (DockerHub)[https://hub.docker.com/r/bridgecrew/checkov]
+* [DockerHub](https://hub.docker.com/r/bridgecrew/checkov)
 
 ### Verify Checkov Installation
 Check to see that you can run the cli for checkov on your terminal.

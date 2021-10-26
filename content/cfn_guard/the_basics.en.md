@@ -1,6 +1,6 @@
 ---
 title: "The Basics"
-weight: 10
+weight: 20
 ---
 
 In this section we will focus on basic concepts needed to write cfn-guard rules.

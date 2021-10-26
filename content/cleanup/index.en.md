@@ -1,6 +1,6 @@
 ---
 title: "Cleanup"
-weight: 50
+weight: 500
 ---
 
 1. Attach the AWS Managed IAM policy AdministratorAccess to the IAM role **PolicyAsCodeRole**.

@@ -1,6 +1,6 @@
 ---
 title: "CFN Lint"
-weight: 30
+weight: 50
 ---
 
 This section focuses on using AWS CloudFormation with the Open Source tool (CFN Lint)[https://github.com/aws-cloudformation/cfn-lint]. CFN Lint is a Python based CLI for scanning CloudFormation templates. 

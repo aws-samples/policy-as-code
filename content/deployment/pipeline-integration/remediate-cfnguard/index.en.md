@@ -6,7 +6,7 @@ weight: 40
 ## Remediate cfn-guard rules violations
 1. As from before replicate cfn-guard run in the local environment. Run the following commands to do that:
     :::code{showCopyAction=true showLineNumbers=false}
-    cd ~/environment/policy-as-code/cdk/app;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json
+    cd ~/environment/policy-as-code/cdk/app;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
     :::
 
     Below is what cfn-guard should output, this will look similiar to what is in the CodeBuild logs:
@@ -78,7 +78,7 @@ weight: 40
     Save the file using Cloud9 menu File->Save
 1. Validate the code by running:
     :::code{showCopyAction=true showLineNumbers=false}
-    cd ~/environment/policy-as-code/cdk/app;cdk synth;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json
+    cd ~/environment/policy-as-code/cdk/app;cdk synth;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
     :::
     Although the s3 bucket policies:
     ```
@@ -283,7 +283,7 @@ weight: 40
     Save this file in Cloud9 with the menu File->Save.
 1. Validate the code by running:
     :::code{showCopyAction=true showLineNumbers=false}
-    cd ~/environment/policy-as-code/cdk/app;cdk synth;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json
+    cd ~/environment/policy-as-code/cdk/app;cdk synth;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
     :::
     The output after cfn-guard runs should look like this:
     ```
@@ -446,7 +446,7 @@ weight: 40
     These changes to S3 bucket with in CDK is needed to configure the S3 with the KMS key that will be created. Save the file in Cloud9 under menu File->Save.
 1. Validate the code by running:
     :::code{showCopyAction=true showLineNumbers=false}
-    cd ~/environment/policy-as-code/cdk/app;cdk synth;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json
+    cd ~/environment/policy-as-code/cdk/app;cdk synth;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
     :::
     The output after cfn-guard runs should look like this:
     ```

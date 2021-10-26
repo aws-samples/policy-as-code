@@ -15,6 +15,10 @@ You can use OPA to enforce policies in microservices, Kubernetes, CI/CD pipeline
 ### How Do I use OPA?
 OPA is a binary that works as command line interface (CLI). This can be installed and run on your local machine, pipeline, container or as a service. Here are more [details](https://www.openpolicyagent.org/docs/latest/#running-opa).
 
+### Why use Regula?
+OPA has been used within the Kubernetes community and is probably the most well known cli tool for validating Rego rules. Regula is another option and comes with a set of rules targeted for AWS Cloudformation, Terraform, as well as Kubernetes YAML manifests. Regula is designed to work with Cloudformation and Terraform and so developers working with these artifacts may find the reporting and usage simpler and more intutive. However, either tool should work with the examples in this workshop.
+
 ### Reference
 * [Open Policy Agent](https://www.openpolicyagent.org/docs/latest/)
-* [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/) 
+* [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/)
+* [Regula](https://regula.dev/) 

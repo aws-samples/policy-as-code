@@ -1,6 +1,6 @@
 ---
 title: "Test Driven Development"
-weight: 41
+weight: 30
 ---
 
 This section focuses on [Test Driven Development](https://en.wikipedia.org/wiki/Test-driven_development) (TDD). cfn-guard makes this easy because it supports unit tests. In this section we will focus on creating our policy as code in three steps:
