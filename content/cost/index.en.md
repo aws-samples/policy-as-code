@@ -2,7 +2,7 @@
 title: "AWS Costs"
 weight: 5
 ---
-This workshop uses the following AWS services:
+This workshop will take approximately 2 hours to complete. It uses the following AWS services:
 - [AWS Cloud9 Pricing](https://aws.amazon.com/cloud9/pricing/)
     - [AWS Cloud9 Pricing](https://aws.amazon.com/ec2/pricing/on-demand/)- m5.large - 2 hours $0.20
     - [AWS Elastic Block Storage Pricing](https://aws.amazon.com/ebs/pricing/) - 100GB - 2 hours 0.03
