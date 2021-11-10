@@ -214,8 +214,10 @@ exports.handler = async function (event, context) {
 };
           `
         ),
-        handler: "index.handler",
-        runtime: lambda.Runtime.NODEJS_14_X,
+        // handler: "index.handler",
+        // runtime: lambda.Runtime.NODEJS_14_X,
+        handler: "update_instance_profile.lambda_handler",
+        runtime: lambda.Runtime.PYTHON_3_9,
         timeout: Duration.minutes(1),
       }
     );

@@ -14,6 +14,7 @@ phases:
     on-failure: ABORT
     runtime-versions:
       nodejs: 14
+      python: 3.8
     commands:
       - cd $CODEBUILD_SRC_DIR/cdk/ide
       - npm install
@@ -26,7 +27,9 @@ phases:
       - npm run build
       - "export AWS_ACCOUNT_ID=$(echo $CODEBUILD_BUILD_ARN | cut -d: -f5)"
       - 'echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"'
-      - npx cdk bootstrap aws://$AWS_ACCOUNT_ID/$AWS_REGION
+      # Install CDK v2
+      - npm install -g aws-cdk@next
+      - cdk bootstrap aws://$AWS_ACCOUNT_ID/$AWS_REGION
   build:
     on-failure: ABORT
     commands:
@@ -35,7 +38,7 @@ phases:
       - 'echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"'
       - 'echo "VPC ID: $VPC_ID"'
       - 'echo "CLOUD9_ENVIRONMENT_ID: $CLOUD9_ENVIRONMENT_ID"'
-      #- npx cdk deploy ClusterStack --require-approval never
+      - npx cdk deploy ClusterStack --require-approval never
   post_build:
     on-failure: ABORT
     commands:
