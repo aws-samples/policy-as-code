@@ -138,7 +138,7 @@ export class ClusterStack extends Stack {
         ),
         //handler: "index.onEventHandler",
         //runtime: lambda.Runtime.NODEJS_14_X,
-        handler: "lamba_function.lambda_handler",
+        handler: "handler.lambda_handler",
         runtime: lambda.Runtime.PYTHON_3_9,
       }
     );
@@ -148,6 +148,7 @@ export class ClusterStack extends Stack {
           "ec2:DescribeIamInstanceProfileAssociations",
           "ec2:ReplaceIamInstanceProfileAssociation",
           "ec2:AssociateIamInstanceProfile",
+          "ec2:DescribeInstances",
           "iam:PassRole",
         ],
         resources: ["*"], // TODO: use specific instance ARN

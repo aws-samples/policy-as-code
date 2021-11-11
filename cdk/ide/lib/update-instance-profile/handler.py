@@ -1,9 +1,10 @@
-from crhelper import CfnResource
 from __future__ import print_function
+from crhelper import CfnResource
 import json
 import boto3
 import logging
 import time
+
 helper = CfnResource()
 
 logger = logging.getLogger(__name__)
@@ -21,9 +22,6 @@ except Exception as e:
 @helper.create
 @helper.update
 def lambda_handler(event, context):
-    # s = int(event['ResourceProperties']['No1']) + \
-    #     int(event['ResourceProperties']['No2'])
-    # helper.Data['Sum'] = s
     try:
         props = event['ResourceProperties']
 
