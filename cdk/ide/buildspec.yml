@@ -39,6 +39,7 @@ phases:
       - 'echo "VPC ID: $VPC_ID"'
       - 'echo "CLOUD9_ENVIRONMENT_ID: $CLOUD9_ENVIRONMENT_ID"'
       - npx cdk deploy ClusterStack --require-approval never
+      # TODO: Add cdk deploy for cicd and app stacks
   post_build:
     on-failure: ABORT
     commands:

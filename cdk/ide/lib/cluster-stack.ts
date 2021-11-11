@@ -134,11 +134,11 @@ export class ClusterStack extends Stack {
       "UpdateInstanceProfileFunction",
       {
         code: lambda.Code.fromAsset(
-          path.join(__dirname, "update-instance-profile")
+          path.join(__dirname, "update_instance_profile.zip")
         ),
         //handler: "index.onEventHandler",
         //runtime: lambda.Runtime.NODEJS_14_X,
-        handler: "update_instance_profile.lambda_handler",
+        handler: "lamba_function.lambda_handler",
         runtime: lambda.Runtime.PYTHON_3_9,
       }
     );
