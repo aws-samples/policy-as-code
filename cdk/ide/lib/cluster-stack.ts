@@ -348,10 +348,19 @@ export class ClusterStack extends Stack {
           Parameters: {
             commands: [
               // Add commands here to taste.
+              // Install Rust and Cargo
+              "curl https://sh.rustup.rs -sSf | sh -s -- -y ",
+              "source $HOME/.cargo/env",
               // Install cfn-guard
-              "$ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/aws-cloudformation/cloudformation-guard/main/install-guard.sh | sh",
+              "cargo install cfn-guard",
+              //"$ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/aws-cloudformation/cloudformation-guard/main/install-guard.sh | sh",
               // Install Checkov
               "pip3 install checkov",
+              // Install Open Policy Agent CLI
+              "cd ~ && curl -L -o opa https://openpolicyagent.org/downloads/v0.34.2/opa_linux_amd64_static && chmod 755 ./opa",
+              // Install Regula
+              "wget https://github.com/fugue/regula/releases/download/v1.6.0/regula_1.6.0_Linux_x86_64.tar.gz",
+              "mkdir ~/bin && tar xvzf regula_1.6.0_Linux_x86_64.tar.gz -C ~/bin regula",
 
               // "mv /tmp/kubectl /usr/local/bin/kubectl",
               // `su -l -c 'aws eks update-kubeconfig --name ${cluster.clusterName} --region ${this.region} --role-arn ${instanceRole.roleArn}' ec2-user`,

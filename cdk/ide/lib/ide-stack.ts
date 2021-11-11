@@ -4,6 +4,7 @@ import {
   StackProps,
   CfnParameter,
   CustomResource,
+  CfnOutput,
 } from "aws-cdk-lib";
 import * as sns from "aws-cdk-lib/aws-sns";
 import * as subs from "aws-cdk-lib/aws-sns-subscriptions";
@@ -227,6 +228,9 @@ exports.handler = async function (event, context) {
         resources: ["*"],
       })
     );
+
+    // Output the Cloud9 IDE URL
+    new CfnOutput(this, "URL", { value: workspace.ideUrl });
 
     new CustomResource(this, "UpdateWorkspaceMembership", {
       serviceToken: updateWorkspaceMembershipFunction.functionArn,
