@@ -40,9 +40,9 @@ phases:
       - 'echo "CLOUD9_ENVIRONMENT_ID: $CLOUD9_ENVIRONMENT_ID"'
       - npx cdk deploy ClusterStack --require-approval never
       - cd $CODEBUILD_SRC_DIR/cdk/cicd
-      - npx cdk deploy --require-approval never
+      - npx cdk deploy --all --require-approval never
       - cd $CODEBUILD_SRC_DIR/cdk/app
-      - npx cdk deploy --require-approval never
+      - npx cdk deploy --all --require-approval never
   post_build:
     on-failure: ABORT
     commands:

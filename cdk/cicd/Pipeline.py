@@ -3,13 +3,18 @@ from aws_cdk import (
     aws_codepipeline_actions,
     aws_ssm,
     aws_codecommit,
-    core,
+    #core,
     aws_cloudformation,
+    Stack,
+    RemovalPolicy,
+    Duration,
+    CfnOutput,  
+    App,  
 )
 
 
-class Pipeline(core.Stack):
-    def __init__(self, app: core.App, id: str, props, **kwargs) -> None:
+class Pipeline(Stack):
+    def __init__(self, app: App, id: str, props, **kwargs) -> None:
         super().__init__(app, id, **kwargs)
         # define the s3 artifact
         source_output = aws_codepipeline.Artifact(artifact_name='source')
@@ -100,7 +105,7 @@ class Pipeline(core.Stack):
             description='cdk pipeline bucket'
         )
         # cfn output
-        core.CfnOutput(
+        CfnOutput(
             self, "PipelineOut",
             description="Pipeline",
             value=pipeline.pipeline_name

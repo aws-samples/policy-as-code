@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@aws-cdk/aws-cloud9-alpha": "^2.0.0-alpha.4",
-    "@aws-cdk/custom-resources": "^1.128.0",
     "aws-cdk-lib": "2.0.0-rc.27",
     "aws-sdk": "^2.1010.0",
     "constructs": "^10.0.0"

@@ -29,7 +29,7 @@ build:
 
 .PHONY: synth-bootstrap
 synth-bootstrap: build
-	npx cdk synth BootstrapStack
+	npx cdk synth IdeStack
 
 .PHONY: deploy
 deploy: build upload
@@ -42,4 +42,4 @@ deploy: build upload
 
 .PHONY: destroy
 destroy:
-	npx cdk destroy BootstrapStack --force
+	npx cdk destroy IdeStack --force

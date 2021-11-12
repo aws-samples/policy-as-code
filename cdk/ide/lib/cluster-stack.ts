@@ -348,6 +348,16 @@ export class ClusterStack extends Stack {
           Parameters: {
             commands: [
               // Add commands here to taste.
+              // Set environment variables
+              "sudo yum -y install jq bash-completion",
+              'echo "export AWS_DEFAULT_REGION=`curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|jq -r .region`" >>  ~/.bash_profile',
+              'echo "export AWS_ACCOUNT_ID=`curl -s http://169.254.169.254/latest/dynamic/instance-identity/document|jq -r .accountId`" >>  ~/.bash_profile',
+              ".  ~/.bash_profile",
+
+              // Clone the workshop repo
+              "cd ~/environment;git clone https://github.com/aws-samples/policy-as-code.git",
+              // Resize the instance volume
+              "bash ~/environment/policy-as-code/cdk/cicd/resize.sh 100",
               // Install Rust and Cargo
               "curl https://sh.rustup.rs -sSf | sh -s -- -y ",
               "source $HOME/.cargo/env",
@@ -361,6 +371,8 @@ export class ClusterStack extends Stack {
               // Install Regula
               "wget https://github.com/fugue/regula/releases/download/v1.6.0/regula_1.6.0_Linux_x86_64.tar.gz",
               "mkdir ~/bin && tar xvzf regula_1.6.0_Linux_x86_64.tar.gz -C ~/bin regula",
+              // Install cfn-lint
+              "pip install cfn-lint",
 
               // "mv /tmp/kubectl /usr/local/bin/kubectl",
               // `su -l -c 'aws eks update-kubeconfig --name ${cluster.clusterName} --region ${this.region} --role-arn ${instanceRole.roleArn}' ec2-user`,
