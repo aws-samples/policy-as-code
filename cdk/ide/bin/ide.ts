@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import * as cdk from "aws-cdk-lib";
-import { IdeStack } from "../lib/ide-stack";
+import { FoundationStack } from "../lib/ide-stack";
 import { ClusterStack } from "../lib/cluster-stack";
 // import { BootstrapStack } from '../lib/bootstrap-stack';
 
@@ -10,12 +10,12 @@ import "source-map-support/register";
 //import * as cdk from '@aws-cdk/core';
 
 const app = new cdk.App();
-new IdeStack(app, "IdeStack", {
+new FoundationStack(app, "FoundationStack", {
   sourceZipFile: process.env.ZIPFILE || "workshop-stack-app.zip",
   sourceZipFileChecksum: process.env.ZIPFILE_CHECKSUM || "",
 });
 
-// See below for example when IdeStack needs environment
+// See below for example when FoundationStack needs environment
 // new BootstrapStack(app, 'BootstrapStack', {
 //     sourceZipFile: process.env.ZIPFILE || 'eks-workshop-stack-app.zip',
 //     sourceZipFileChecksum: process.env.ZIPFILE_CHECKSUM || '',

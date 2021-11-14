@@ -71,23 +71,14 @@ const respond = async function(event, context, responseStatus, responseData, phy
 `;
 
 // Properties needed for the stack
-export interface IdeStackProps extends StackProps {
+export interface FoundationStackProps extends StackProps {
   sourceZipFile: string;
   sourceZipFileChecksum: string;
 }
 
-export class IdeStack extends Stack {
-  constructor(scope: Construct, id: string, props: IdeStackProps) {
+export class FoundationStack extends Stack {
+  constructor(scope: Construct, id: string, props: FoundationStackProps) {
     super(scope, id, props);
-
-    // From CDK sample app
-    const queue = new sqs.Queue(this, "IdeQueue", {
-      visibilityTimeout: Duration.seconds(300),
-    });
-
-    const topic = new sns.Topic(this, "IdeTopic");
-
-    topic.addSubscription(new subs.SqsSubscription(queue));
 
     // These parameters appear to be supplied by Event Engine. We'll
     // take advantage of them to locate the Zip file containing this

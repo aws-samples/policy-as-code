@@ -29,17 +29,17 @@ build:
 
 .PHONY: synth-bootstrap
 synth-bootstrap: build
-	npx cdk synth IdeStack
+	npx cdk synth FoundationStack
 
 .PHONY: deploy
 deploy: build upload
-	npx cdk deploy IdeStack --require-approval=never \
+	npx cdk deploy FoundationStack --require-approval=never \
 		--previous-parameters=false \
-		--parameters IdeStack:EEAssetsBucket=$(S3_ASSET_BUCKET) \
-		--parameters IdeStack:EEAssetsKeyPrefix=$(S3_ASSET_PREFIX) \
-		--parameters IdeStack:SourceZipFile=$(ZIPFILE) \
-		--parameters IdeStack:SourceZipFileChecksum=$$(openssl sha256 -hex -r $(ZIPFILE) | cut -d' ' -f1)
+		--parameters FoundationStack:EEAssetsBucket=$(S3_ASSET_BUCKET) \
+		--parameters FoundationStack:EEAssetsKeyPrefix=$(S3_ASSET_PREFIX) \
+		--parameters FoundationStack:SourceZipFile=$(ZIPFILE) \
+		--parameters FoundationStack:SourceZipFileChecksum=$$(openssl sha256 -hex -r $(ZIPFILE) | cut -d' ' -f1)
 
 .PHONY: destroy
 destroy:
-	npx cdk destroy IdeStack --force
+	npx cdk destroy FoundationStack --force

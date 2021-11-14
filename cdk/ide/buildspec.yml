@@ -40,8 +40,10 @@ phases:
       - 'echo "CLOUD9_ENVIRONMENT_ID: $CLOUD9_ENVIRONMENT_ID"'
       - npx cdk deploy ClusterStack --require-approval never
       - cd $CODEBUILD_SRC_DIR/cdk/cicd
+      - pip install -t . -r requirements.txt
       - npx cdk deploy --all --require-approval never
       - cd $CODEBUILD_SRC_DIR/cdk/app
+      - pip install -t . -r requirements.txt
       - npx cdk deploy --all --require-approval never
   post_build:
     on-failure: ABORT

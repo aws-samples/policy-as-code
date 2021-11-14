@@ -318,9 +318,12 @@ export class ClusterStack extends Stack {
     const runCommandLogGroup = new logs.LogGroup(this, "RunCommandLogs");
     runCommandLogGroup.grantWrite(runCommandRole);
 
+    // Check the Cloud9 instance status before sending commands
+    //new cr.AwsCustomResource(this, "CheckInstanceStatus", {
+
     // Now, invoke RunCommand.
-    new cr.AwsCustomResource(this, "InstancePrep", {
-      installLatestAwsSdk: false,
+    /*     new cr.AwsCustomResource(this, "InstancePrep", {
+      installLatestAwsSdk: true,
       policy: cr.AwsCustomResourcePolicy.fromStatements([
         new iam.PolicyStatement({
           actions: ["iam:PassRole"],
@@ -397,7 +400,7 @@ export class ClusterStack extends Stack {
         outputPaths: ["CommandId"],
       },
     });
-
+ */
     // TODO: Install anything else we need
   }
 }

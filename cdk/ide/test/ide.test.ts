@@ -4,7 +4,7 @@ import * as Ide from "../lib/ide-stack";
 test("SQS Queue and SNS Topic Created", () => {
   const app = new cdk.App();
   // WHEN
-  const stack = new Ide.IdeStack(app, "MyTestStack", {
+  const stack = new Ide.FoundationStack(app, "MyTestStack", {
     sourceZipFile: "workshop-stack-app.zip",
     sourceZipFileChecksum: "",
   });
