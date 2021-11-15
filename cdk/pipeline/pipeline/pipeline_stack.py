@@ -4,6 +4,7 @@ from aws_cdk import (
     Stack,
     RemovalPolicy,
     CfnOutput,
+    CfnCapabilities,
     aws_iam as iam,
     aws_sqs as sqs,
     aws_sns as sns,
@@ -185,7 +186,7 @@ class PipelineStack(Stack):
                                 artifact=scanned_source, file_name='cdk.out/policy-as-code.template.json'),
                             run_order=2,
                             cfn_capabilities=[
-                                cfn.CloudFormationCapabilities.NAMED_IAM],
+                                CfnCapabilities.NAMED_IAM],
                             admin_permissions=True
                         ),
                         actions.CloudFormationExecuteChangeSetAction(

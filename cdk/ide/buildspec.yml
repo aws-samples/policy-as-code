@@ -40,7 +40,7 @@ phases:
       - 'echo "CLOUD9_ENVIRONMENT_ID: $CLOUD9_ENVIRONMENT_ID"'
       - npx cdk deploy ClusterStack --require-approval never
       - cd $CODEBUILD_SRC_DIR/cdk/pipeline
-      #- pip install -t . -r requirements.txt
+      - pip install -t . -r requirements.txt
       - npx cdk deploy --all --require-approval never
       #- cd $CODEBUILD_SRC_DIR/cdk/app
       #- pip install -t . -r requirements.txt

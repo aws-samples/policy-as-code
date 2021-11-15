@@ -333,7 +333,7 @@ exports.handler = async function (event, context) {
 
     // Lambda function to execute once CodeBuild has finished producing a build.
     // This will signal CloudFormation that the build (i.e., deploying the actual
-    // EKS stack) has completed.
+    // infra stack for the workshop) has completed.
     const reportBuildFunction = new lambda.Function(
       this,
       "ReportBuildFunction",
