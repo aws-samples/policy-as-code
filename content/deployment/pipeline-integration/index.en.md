@@ -1,6 +1,6 @@
 ---
 title: "DevSecOps Workflow"
-weight: 61
+weight: 10
 ---
 
 ## Overview
