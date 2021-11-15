@@ -1,4 +1,4 @@
-# Aws-workshop-template
+# Policy as Code Workshop
 
 ## Repo structure
 
@@ -11,6 +11,13 @@
     └── index.en.md                   <-- At the root of each directory, there must be at least one markdown file
     └── introduction                  <-- Directory for workshop content markdown
         └── index.en.md               <-- Markdown file that would be render 
+├── cdk                               <-- AWS CDK applications for deploying CI/CD pipeline, cfn-guard app, and IDE environment
+    └── app                           <-- IaC and cfn-guard rules
+    └── cicd                          <-- CICD pipeline to deploy IaC
+    └── ide
+    └── pipeline
+├── terraform                         <-- Terraform application using Regula
+
 ```
 
 ## What's Included

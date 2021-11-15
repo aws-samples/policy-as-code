@@ -1,3 +1,5 @@
 **/cdk/*/cdk.out/*
 **/cdk/*/*pycache*
 **.DS_store**
+**.terraform**
+**cfn-guard-linux**
