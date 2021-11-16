@@ -29,7 +29,7 @@ phases:
       - 'echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"'
       # Install CDK v2
       - npm install -g aws-cdk@next
-      - cdk bootstrap aws://$AWS_ACCOUNT_ID/$AWS_REGION
+      - npx cdk bootstrap aws://$AWS_ACCOUNT_ID/$AWS_REGION
   build:
     on-failure: ABORT
     commands:
@@ -39,9 +39,9 @@ phases:
       - 'echo "VPC ID: $VPC_ID"'
       - 'echo "CLOUD9_ENVIRONMENT_ID: $CLOUD9_ENVIRONMENT_ID"'
       - npx cdk deploy ClusterStack --require-approval never
-      - cd $CODEBUILD_SRC_DIR/cdk/pipeline
-      - pip install -t . -r requirements.txt
-      - npx cdk deploy --all --require-approval never
+      #- cd $CODEBUILD_SRC_DIR/cdk/pipeline
+      #- pip install -t . -r requirements.txt
+      #- npx cdk deploy --all --require-approval never
       #- cd $CODEBUILD_SRC_DIR/cdk/app
       #- pip install -t . -r requirements.txt
       #- npx cdk deploy --all --require-approval never
@@ -49,6 +49,6 @@ phases:
     on-failure: ABORT
     commands:
       - cd $CODEBUILD_SRC_DIR
-      #- "eval $(aws cloudformation describe-stacks --stack-name ClusterStack --query 'Stacks[0].Outputs[?contains(OutputKey, `ClusterConfigCommand`)].OutputValue' --output text | sed -e 's/--role-arn.*//')"
+      - "eval $(aws cloudformation describe-stacks --stack-name ClusterStack --query 'Stacks[0].Outputs[?contains(OutputKey, `ClusterConfigCommand`)].OutputValue' --output text | sed -e 's/--role-arn.*//')"
       #- "/tmp/kubectl delete mutatingwebhookconfigurations vpc-resource-mutating-webhook || :"
       #- "/tmp/kubectl apply -f attack/complete-demo.yaml || :"

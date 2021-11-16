@@ -96,9 +96,9 @@ export class FoundationStack extends Stack {
     });
 
     const teamRoleArn = new CfnParameter(this, "EETeamRoleArn", {
-      //default: "RoleArnNotSet",
+      default: "RoleArnNotSet",
       // TODO: Remove this and/or move it to config file
-      default: "arn:aws:iam::103580932836:role/EventEngineTestingRole",
+      //default: "arn:aws:iam::103580932836:role/EventEngineTestingRole",
       type: "String",
     });
 
@@ -255,7 +255,7 @@ exports.handler = async function (event, context) {
       },
       source: codebuild.Source.s3({
         bucket: assetBucket,
-        path: `${assetPrefix.valueAsString}${sourceZipFile.valueAsString}`,
+        path: `${assetPrefix.valueAsString}/${sourceZipFile.valueAsString}`,
       }),
       timeout: Duration.minutes(90),
     });

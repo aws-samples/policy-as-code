@@ -13,8 +13,8 @@ helper = CfnResource(json_logging=False, log_level='DEBUG',
                      boto_level='CRITICAL', sleep_on_delete=120, ssl_verify=None)
 
 try:
-    # Init code goes here
-    pass
+    ec2_client = boto3.client('ec2')
+    ssm_client = boto3.client('ssm')
 except Exception as e:
     helper.init_failure(e)
 
@@ -32,6 +32,12 @@ def lambda_handler(event, context):
         instance = ec2.describe_instances(Filters=[
             {'Name': 'instance-id', 'Values': [props['InstanceId']]}])['Reservations'][0]['Instances'][0]
         instanceId = instance['InstanceId']
+
+        while not ssm_ready(instanceId):
+            if context.get_remaining_time_in_millis() < 20000:
+                raise Exception(
+                    "Timed out waiting for instance to register with SSM")
+            time.sleep(15)
 
         # Create the IamInstanceProfile request object
         iam_instance_profile = {
@@ -60,6 +66,17 @@ def lambda_handler(event, context):
 @helper.delete
 def no_op(_, __):
     pass
+
+
+def ssm_ready(instance_id):
+    try:
+        response = ssm_client.describe_instance_information(Filters=[
+            {'Key': 'InstanceIds', 'Values': [instance_id]}
+        ])
+        logger.debug(response)
+        return True
+    except ssm_client.exceptions.InvalidInstanceId:
+        return False
 
 
 def handler(event, context):

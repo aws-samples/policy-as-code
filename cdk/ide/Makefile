@@ -1,8 +1,8 @@
 ZIPFILE ?= policy-as-code-workshop-stack-app.zip
-#S3_ASSET_BUCKET ?= ee-assets-prod-us-east-1
-#S3_ASSET_PREFIX ?= modules/90b84d433ffe415d829cfb33ded5c260/v1/
-S3_ASSET_BUCKET ?= ee-assets-jaknn-sandbox
-S3_ASSET_PREFIX ?= modules/local_testing/v1/
+S3_ASSET_BUCKET ?= ee-assets-prod-us-east-1
+S3_ASSET_PREFIX ?= modules/7381f5596f1840508211082c797067c0/v1/
+#S3_ASSET_BUCKET ?= ee-assets-jaknn-sandbox
+#S3_ASSET_PREFIX ?= modules/local_testing/v1/
 S3_URL := s3://$(S3_ASSET_BUCKET)/$(S3_ASSET_PREFIX)$(ZIPFILE)
 
 .PHONY: upload
