@@ -15,8 +15,8 @@
 package rules.tf_aws_s3_bucket_sse
 
 __rego__metadoc__ := {
-  "id": "AWS_S3_Encryption",
-  "title": "S3 bucket server side encryption should be enabled",
+  "id": "FG_S0001",
+  "title": "S3 bucket server side encryption should be enabled using KMS (not with AWS S3-Managed Keys)",
   "description": "S3 bucket server side encryption should be enabled. Enabling server-side encryption (SSE) on S3 buckets at the object level protects data at rest and helps prevent the breach of sensitive information assets. Objects can be encrypted with KMS-Managed Keys (SSE-KMS) and Customer-Provided Keys (SSE-C).",
   "custom": {
     "controls": {
