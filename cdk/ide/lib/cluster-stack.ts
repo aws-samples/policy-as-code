@@ -56,7 +56,9 @@ export class ClusterStack extends Stack {
       props.codeBuildRoleArn
     );
 
-    // Create an EC2 instance role for the Cloud9 environment. This instance
+    // MOVED TO FoundationStack
+
+    /*     // Create an EC2 instance role for the Cloud9 environment. This instance
     // role is powerful, allowing the participant to have unfettered access to
     // the provisioned account. This might be too broad. It's possible to
     // tighten this down, but there may be unintended consequences.
@@ -67,8 +69,10 @@ export class ClusterStack extends Stack {
       ],
       description: "Workspace EC2 instance role",
     });
+ */
 
-    // During internal testing we found that Isengard account baselining
+    // MOVED to FoundationStack
+    /*     // During internal testing we found that Isengard account baselining
     // was attaching IAM roles to instances in the background. This prevents
     // the stack from being cleanly destroyed, so we will record the instance
     // role name and use it later to delete any attached policies before
@@ -76,7 +80,7 @@ export class ClusterStack extends Stack {
     new CfnOutput(this, "WorkspaceInstanceRoleName", {
       value: instanceRole.roleName,
     });
-
+ 
     const instanceProfile = new iam.CfnInstanceProfile(
       this,
       "WorkspaceInstanceProfile",
@@ -84,7 +88,7 @@ export class ClusterStack extends Stack {
         roles: [instanceRole.roleName],
       }
     );
-
+*/
     // Obtain Cloud9 workspace instance ID and security group.
     const workspaceInstance = new cr.AwsCustomResource(
       this,
@@ -126,23 +130,20 @@ export class ClusterStack extends Stack {
       )
     );
 
+    // MOVED to FoundationStack
     // This function provides a Custom Resource that detaches any existing IAM
     // instance profile that might be attached to the Cloud9 Environment, and
     // replaces it with the profile+role we created ourselves.
-    const updateInstanceProfileFunction = new lambda.Function(
-      this,
-      "UpdateInstanceProfileFunction",
-      {
-        code: lambda.Code.fromAsset(
-          path.join(__dirname, "update-instance-profile")
-        ),
-        //handler: "index.onEventHandler",
-        //runtime: lambda.Runtime.NODEJS_14_X,
-        handler: "handler.lambda_handler",
-        runtime: lambda.Runtime.PYTHON_3_9,
-      }
-    );
-    updateInstanceProfileFunction.addToRolePolicy(
+    /*     const fileFunction = new lambda.Function(this, "fileFunction", {
+      code: lambda.Code.fromAsset(
+        path.join(__dirname, "update-instance-profile")
+      ),
+      //handler: "index.onEventHandler",
+      //runtime: lambda.Runtime.NODEJS_14_X,
+      handler: "handler.lambda_handler",
+      runtime: lambda.Runtime.PYTHON_3_9,
+    });
+    fileFunction.addToRolePolicy(
       new iam.PolicyStatement({
         actions: [
           "ec2:DescribeIamInstanceProfileAssociations",
@@ -150,29 +151,28 @@ export class ClusterStack extends Stack {
           "ec2:AssociateIamInstanceProfile",
           "ec2:DescribeInstances",
           "iam:PassRole",
+          "ssm:DescribeInstanceInformation",
         ],
         resources: ["*"], // TODO: use specific instance ARN
       })
     );
 
-    const updateInstanceProfile = new cr.Provider(
-      this,
-      "UpdateInstanceProfileProvider",
-      {
-        onEventHandler: updateInstanceProfileFunction,
-      }
-    );
+    const file = new cr.Provider(this, "fileProvider", {
+      onEventHandler: fileFunction,
+    });
 
-    new CustomResource(this, "UpdateInstanceProfile", {
-      serviceToken: updateInstanceProfile.serviceToken,
+    new CustomResource(this, "file", {
+      serviceToken: file.serviceToken,
       properties: {
         InstanceId: instanceId,
         InstanceProfileArn: instanceProfile.attrArn,
       },
     });
+ */
 
+    // TODO: Remove this NOT NEEDED
     // Create an SSH key pair for logging into the K8S nodes.
-    const sshKeyPair = new cr.AwsCustomResource(this, "SSHKeyPair", {
+    /*     const sshKeyPair = new cr.AwsCustomResource(this, "SSHKeyPair", {
       policy: cr.AwsCustomResourcePolicy.fromSdkCalls({
         resources: cr.AwsCustomResourcePolicy.ANY_RESOURCE,
       }),
@@ -198,7 +198,10 @@ export class ClusterStack extends Stack {
     const keyMaterial = sshKeyPair.getResponseField("KeyMaterial");
     const keyName = sshKeyPair.getResponseField("KeyName");
 
-    /*     // Create our EKS cluster.
+ */
+
+    /*     
+    // Create our EKS cluster.
     const cluster = new eks.Cluster(this, "Cluster", {
       vpc,
       version: eks.KubernetesVersion.V1_21,
@@ -317,9 +320,6 @@ export class ClusterStack extends Stack {
     });
     const runCommandLogGroup = new logs.LogGroup(this, "RunCommandLogs");
     runCommandLogGroup.grantWrite(runCommandRole);
-
-    // Check the Cloud9 instance status before sending commands
-    //new cr.AwsCustomResource(this, "CheckInstanceStatus", {
 
     // Now, invoke RunCommand.
     /*     new cr.AwsCustomResource(this, "InstancePrep", {

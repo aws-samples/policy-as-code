@@ -1,3 +1,4 @@
+// CloudFormation constructs
 import {
   Duration,
   Stack,
@@ -6,22 +7,33 @@ import {
   CustomResource,
   CfnOutput,
 } from "aws-cdk-lib";
-import * as sns from "aws-cdk-lib/aws-sns";
-import * as subs from "aws-cdk-lib/aws-sns-subscriptions";
-import * as sqs from "aws-cdk-lib/aws-sqs";
-import { aws_s3 as s3 } from "aws-cdk-lib";
-import { aws_ec2 as ec2 } from "aws-cdk-lib";
-import { aws_iam as iam } from "aws-cdk-lib";
-import { aws_lambda as lambda } from "aws-cdk-lib";
-import { aws_codebuild as codebuild } from "aws-cdk-lib";
-import { aws_events as events } from "aws-cdk-lib";
-import { aws_events_targets as targets } from "aws-cdk-lib";
-import { Construct } from "constructs";
+
+// Services used by this stack
+import {
+  aws_s3 as s3,
+  aws_ec2 as ec2,
+  aws_iam as iam,
+  aws_lambda as lambda,
+  aws_codebuild as codebuild,
+  aws_events as events,
+  aws_events_targets as targets,
+  custom_resources as cr,
+} from "aws-cdk-lib";
+
+// Higher order constructs
 import * as cloud9 from "@aws-cdk/aws-cloud9-alpha";
-//import { aws_events_targets.LambdaFunction as LambdaTarget } from 'aws-cdk-lib';
+
+// CDK stuff
+import { Construct } from "constructs";
+import { Handler } from "aws-cdk-lib/lib/aws-lambda";
+
+// Other typescript modules
+import * as path from "path";
 
 // This function is based on the cfnresponse JS module that is published
 // by CloudFormation. It's an async function that makes coding much easier.
+
+// TODO: Remove this - replaced with new lambda code based on crhelper Python framework
 const respondFunction = `
 const respond = async function(event, context, responseStatus, responseData, physicalResourceId, noEcho) {
   return new Promise((resolve, reject) => {
@@ -74,6 +86,7 @@ const respond = async function(event, context, responseStatus, responseData, phy
 export interface FoundationStackProps extends StackProps {
   sourceZipFile: string;
   sourceZipFileChecksum: string;
+  sourceZipURI: string;
 }
 
 export class FoundationStack extends Stack {
@@ -119,6 +132,11 @@ export class FoundationStack extends Stack {
       }
     );
 
+    const sourceZipURI = new CfnParameter(this, "SourceZipURI", {
+      default: props.sourceZipURI,
+      type: "String",
+    });
+
     const assetBucket = s3.Bucket.fromBucketName(
       this,
       "SourceBucket",
@@ -130,7 +148,8 @@ export class FoundationStack extends Stack {
     // (CodeBuild builds perform in a different role context, which makes the
     // environment inaccessible.)
     //
-    // First, we need a VPC to put it in.
+
+    // ------VPC------
     const vpc = new ec2.Vpc(this, "VPC", {
       maxAzs: 2,
       cidr: "10.0.0.0/16",
@@ -149,88 +168,7 @@ export class FoundationStack extends Stack {
       ],
     });
 
-    // Create the Cloud9 environment
-    const workspace = new cloud9.Ec2Environment(this, "Workspace", {
-      vpc: vpc,
-      ec2EnvironmentName: "aws-workshop",
-      description: "AWS Event Workshop",
-      // Can't use t3a instances for Cloud9 due to silly server-side regex filter. Oh, well.
-      instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.T3,
-        ec2.InstanceSize.MEDIUM
-      ),
-      subnetSelection: { subnetType: ec2.SubnetType.PUBLIC },
-    });
-
-    const updateWorkspaceMembershipFunction = new lambda.Function(
-      this,
-      "UpdateWorkspaceMembershipFunction",
-      {
-        code: lambda.Code.fromInline(
-          respondFunction +
-            `
-exports.handler = async function (event, context) {
-  console.log(JSON.stringify(event, null, 4));
-  const AWS = require('aws-sdk');
-
-  try {
-    const environmentId = event.ResourceProperties.EnvironmentId;
-
-    if (event.RequestType === "Create" || event.RequestType === "Update") {
-      const eeTeamRoleArn = event.ResourceProperties.EETeamRoleArn;
-
-      if (!!eeTeamRoleArn && eeTeamRoleArn !== 'RoleArnNotSet') {
-        const arnSplit = eeTeamRoleArn.split(':');
-        const accountNumber = arnSplit[4];
-        const resourceName = arnSplit[5].split('/')[1];
-        const eeTeamAssumedRoleArn = \`arn:aws:sts::\${accountNumber}:assumed-role/\${resourceName}/MasterKey\`;
-
-        console.log('Resolved EE Team Assumed Role ARN: ' + eeTeamAssumedRoleArn);
-
-        const cloud9 = new AWS.Cloud9();
-
-        const { membership } = await cloud9.createEnvironmentMembership({
-            environmentId,
-            permissions: 'read-write',
-            userArn: eeTeamAssumedRoleArn,
-        }).promise();
-        console.log(JSON.stringify(membership, null, 4));
-      }
-    }
-    console.log('Sending SUCCESS response');
-    await respond(event, context, 'SUCCESS', {}, environmentId);
-  } catch (error) {
-      console.error(error);
-      await respond(event, context, 'FAILED', { Error: error });
-  }
-};
-          `
-        ),
-        // handler: "index.handler",
-        // runtime: lambda.Runtime.NODEJS_14_X,
-        handler: "update_instance_profile.lambda_handler",
-        runtime: lambda.Runtime.PYTHON_3_9,
-        timeout: Duration.minutes(1),
-      }
-    );
-    updateWorkspaceMembershipFunction.addToRolePolicy(
-      new iam.PolicyStatement({
-        actions: ["cloud9:createEnvironmentMembership"],
-        resources: ["*"],
-      })
-    );
-
-    // Output the Cloud9 IDE URL
-    new CfnOutput(this, "URL", { value: workspace.ideUrl });
-
-    new CustomResource(this, "UpdateWorkspaceMembership", {
-      serviceToken: updateWorkspaceMembershipFunction.functionArn,
-      properties: {
-        EnvironmentId: workspace.environmentId,
-        EETeamRoleArn: teamRoleArn.valueAsString,
-      },
-    });
-
+    // ------CodeBuild------
     // Most of the resources will be provisioned via CDK. To accomplish this,
     // we will leverage CodeBuild as the execution engine for a Custom Resource.
     const buildProjectRole = new iam.Role(this, "BuildProjectRole", {
@@ -255,9 +193,9 @@ exports.handler = async function (event, context) {
       },
       source: codebuild.Source.s3({
         bucket: assetBucket,
-        path: `${assetPrefix.valueAsString}/${sourceZipFile.valueAsString}`,
+        path: `${assetPrefix.valueAsString}${sourceZipFile.valueAsString}`,
       }),
-      timeout: Duration.minutes(90),
+      timeout: Duration.minutes(15),
     });
 
     // Custom resource function to start a build. The "application" being built
@@ -412,7 +350,7 @@ exports.handler = async function (event, context) {
       properties: {
         ProjectName: buildProject.projectName,
         VpcId: vpc.vpcId,
-        Cloud9EnvironmentId: workspace.environmentId,
+        // Cloud9EnvironmentId: workspace.environmentId,
         BuildRoleArn: buildProjectRole.roleArn,
         // This isn't actually used by the custom resource. We use a change in
         // the checksum as a way to signal to CloudFormation that the input has
@@ -421,5 +359,277 @@ exports.handler = async function (event, context) {
       },
     });
     clusterStack.node.addDependency(buildCompleteRule, buildProjectPolicy, vpc);
+
+    // ------Cloud9------
+    const workspace = new cloud9.Ec2Environment(this, "Workspace", {
+      vpc: vpc,
+      ec2EnvironmentName: "aws-workshop",
+      description: "AWS Event Workshop",
+      // Can't use t3a instances for Cloud9 due to silly server-side regex filter. Oh, well.
+      instanceType: ec2.InstanceType.of(
+        ec2.InstanceClass.T3,
+        ec2.InstanceSize.MEDIUM
+      ),
+      subnetSelection: { subnetType: ec2.SubnetType.PUBLIC },
+    });
+
+    // Output the Cloud9 IDE URL
+    new CfnOutput(this, "URL", { value: workspace.ideUrl });
+
+    // TODO: Determine if this is needed. Calls cloud9:CreateEnvironmentMembership(EETeamRoleArn, WorkspaceId))
+    /*     const updateWorkspaceMembershipFunction = new lambda.Function(
+      this,
+      "UpdateWorkspaceMembershipFunction",
+      {
+        code: lambda.Code.fromInline(
+          respondFunction +
+            `
+exports.handler = async function (event, context) {
+  console.log(JSON.stringify(event, null, 4));
+  const AWS = require('aws-sdk');
+
+  try {
+    const environmentId = event.ResourceProperties.EnvironmentId;
+
+    if (event.RequestType === "Create" || event.RequestType === "Update") {
+      const eeTeamRoleArn = event.ResourceProperties.EETeamRoleArn;
+
+      if (!!eeTeamRoleArn && eeTeamRoleArn !== 'RoleArnNotSet') {
+        const arnSplit = eeTeamRoleArn.split(':');
+        const accountNumber = arnSplit[4];
+        const resourceName = arnSplit[5].split('/')[1];
+        const eeTeamAssumedRoleArn = \`arn:aws:sts::\${accountNumber}:assumed-role/\${resourceName}/MasterKey\`;
+
+        console.log('Resolved EE Team Assumed Role ARN: ' + eeTeamAssumedRoleArn);
+
+        const cloud9 = new AWS.Cloud9();
+
+        const { membership } = await cloud9.createEnvironmentMembership({
+            environmentId,
+            permissions: 'read-write',
+            userArn: eeTeamAssumedRoleArn,
+        }).promise();
+        console.log(JSON.stringify(membership, null, 4));
+      }
+    }
+    console.log('Sending SUCCESS response');
+    await respond(event, context, 'SUCCESS', {}, environmentId);
+  } catch (error) {
+      console.error(error);
+      await respond(event, context, 'FAILED', { Error: error });
+  }
+};
+          `
+        ),
+        // handler: "index.handler",
+        // runtime: lambda.Runtime.NODEJS_14_X,
+        handler: "update_instance_profile.lambda_handler",
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.minutes(1),
+      }
+    );
+    updateWorkspaceMembershipFunction.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ["cloud9:createEnvironmentMembership"],
+        resources: ["*"],
+      })
+    );
+
+
+    new CustomResource(this, "UpdateWorkspaceMembership", {
+      serviceToken: updateWorkspaceMembershipFunction.functionArn,
+      properties: {
+        EnvironmentId: workspace.environmentId,
+        EETeamRoleArn: teamRoleArn.valueAsString,
+      },
+    });
+ */
+
+    // CLOUD9 - INSTANCE PROFILE
+    // --------------------------------------------------------------------------------
+    // Create an EC2 instance role for the Cloud9 environment. This instance
+    // role is powerful, allowing the participant to have unfettered access to
+    // the provisioned account. This might be too broad. It's possible to
+    // tighten this down, but there may be unintended consequences.
+    const instanceRole = new iam.Role(this, "WorkspaceInstanceRole", {
+      assumedBy: new iam.ServicePrincipal("ec2.amazonaws.com"),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName("AdministratorAccess"),
+      ],
+      description: "Cloud9 Workspace EC2 instance role",
+    });
+
+    // During internal testing we found that Isengard account baselining
+    // was attaching IAM roles to instances in the background. This prevents
+    // the stack from being cleanly destroyed, so we will record the instance
+    // role name and use it later to delete any attached policies before
+    // cleanup.
+    new CfnOutput(this, "WorkspaceInstanceRoleName", {
+      value: instanceRole.roleName,
+    });
+
+    // Create an instance profile for the Cloud9 environment.
+    const instanceProfile = new iam.CfnInstanceProfile(
+      this,
+      "WorkspaceInstanceProfile",
+      {
+        roles: [instanceRole.roleName],
+      }
+    );
+
+    // ------------LAMBDA EXECUTION ROLE----------------
+    // Build IAM role for custom resource lambda functions to initialize Cloud9
+    const lambdaRole = new iam.Role(this, "Cloud9InitializtionLambdaRole", {
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+      description: "Execution role for Cloud9 bootstrapping functions",
+    });
+
+    lambdaRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: [
+          "cloudformation:DescribeStackResources",
+          "ec2:AssociateIamInstanceProfile",
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:DescribeInstances",
+          "ec2:DescribeInstanceStatus",
+          "ec2:DescribeInstanceAttribute",
+          "ec2:DescribeIamInstanceProfileAssociations",
+          "ec2:DescribeVolumes",
+          "ec2:DesctibeVolumeAttribute",
+          "ec2:DescribeVolumesModifications",
+          "ec2:DescribeVolumeStatus",
+          "ec2:StartInstances",
+          "ec2:StopInstances",
+          "ssm:DescribeInstanceInformation",
+          "ec2:ModifyVolume",
+          "ec2:ReplaceIamInstanceProfileAssociation",
+          "ec2:ReportInstanceStatus",
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation",
+          "s3:GetObject",
+        ],
+        resources: ["*"], //TODO: Refactor and scope this down
+      })
+    );
+
+    lambdaRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ["iam:PassRole"],
+        resources: [instanceRole.roleArn],
+      })
+    );
+
+    lambdaRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ["lambda:AddPermission", "lambda:RemovePermission"],
+        resources: ["*"],
+      })
+    );
+
+    lambdaRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: [
+          "events:PutRule",
+          "events:DeleteRule",
+          "events:PutTargets",
+          "events:RemoveTargets",
+        ],
+        resources: ["*"],
+      })
+    );
+
+    // Attach instance profile to the Cloud9 environment via Lambda backed custom resource
+    // Thanks to maishsk@ for this code: https://gitlab.aws.dev/maishsk/cloud9-event-engine-cfn-template
+
+    const updateInstanceProfileFunction = new lambda.Function(
+      this,
+      "UpdateInstanceProfileFunction",
+      {
+        code: lambda.Code.fromAsset(path.join(__dirname, "c9InstanceProfile")),
+        handler: "lambda_function.handler",
+        role: lambdaRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.minutes(1),
+      }
+    );
+
+    const updateInstanceProfileProvider = new cr.Provider(
+      this,
+      "UpdateInstanceProfileProvider",
+      {
+        onEventHandler: updateInstanceProfileFunction,
+      }
+    );
+
+    new CustomResource(this, "UpdateInstanceProfile", {
+      serviceToken: updateInstanceProfileProvider.serviceToken,
+      properties: {
+        InstanceProfile: instanceProfile.attrArn,
+        Cloud9Environment: workspace.ec2EnvironmentArn,
+      },
+    });
+
+    // CLOUD9 - DISK RESIZE
+    // --------------------------------------------------------------------------------
+    // Resize the EBS volume attached to the Cloud9 EC2 instance
+    // Thanks to maishsk@ for this code: https://gitlab.aws.dev/maishsk/cloud9-event-engine-cfn-template
+
+    const diskResizeFunction = new lambda.Function(
+      this,
+      "Cloud9DiskResizeFunction",
+      {
+        code: lambda.Code.fromAsset(path.join(__dirname, "c9DiskResize")),
+        handler: "lambda_function.handler",
+        role: lambdaRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.minutes(1),
+      }
+    );
+
+    const diskResizeProvider = new cr.Provider(
+      this,
+      "Cloud9DiskResizeProvider",
+      {
+        onEventHandler: diskResizeFunction,
+      }
+    );
+
+    new CustomResource(this, "Cloud9ResizeDisk", {
+      serviceToken: diskResizeProvider.serviceToken,
+      properties: {
+        EBSVolumeSize: 32, //TODO: Parameterize this?
+      },
+    });
+
+    // CLOUD9 - BOOTSTRAP
+    // --------------------------------------------------------------------------------
+    // Finish configuring the Cloud9 environment, e.g. installing packages, running scripts
+    // Thanks to maishsk@ for this code: https://gitlab.aws.dev/maishsk/cloud9-event-engine-cfn-template
+
+    const bootstrapFunction = new lambda.Function(
+      this,
+      "Cloud9BootstrapFunction",
+      {
+        code: lambda.Code.fromAsset(path.join(__dirname, "c9bootstrap")),
+        handler: "lambda_function.handler",
+        role: lambdaRole,
+        runtime: lambda.Runtime.PYTHON_3_9,
+        timeout: Duration.minutes(1),
+      }
+    );
+
+    const bootstrapProvider = new cr.Provider(this, "Cloud9BootstrapProvider", {
+      onEventHandler: bootstrapFunction,
+    });
+
+    new CustomResource(this, "Cloud9Bootstrap", {
+      serviceToken: bootstrapProvider.serviceToken,
+      properties: {
+        InstanceId: instanceProfile.attrArn,
+        BootstrapPath:
+          "s3://" + assetBucketName + "/" + assetPrefix + "/bootstrap.sh",
+        BootstrapArguments: "",
+      },
+    });
   }
 }

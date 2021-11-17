@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import * as cdk from "aws-cdk-lib";
 import { FoundationStack } from "../lib/ide-stack";
-import { ClusterStack } from "../lib/cluster-stack";
+//import { ClusterStack } from "../lib/cluster-stack";
 // import { BootstrapStack } from '../lib/bootstrap-stack';
 
 // From CDK workshop stack
@@ -13,6 +13,7 @@ const app = new cdk.App();
 new FoundationStack(app, "FoundationStack", {
   sourceZipFile: process.env.ZIPFILE || "workshop-stack-app.zip",
   sourceZipFileChecksum: process.env.ZIPFILE_CHECKSUM || "",
+  sourceZipURI: process.env.S3_URL || "",
 });
 
 // See below for example when FoundationStack needs environment
@@ -21,8 +22,9 @@ new FoundationStack(app, "FoundationStack", {
 //     sourceZipFileChecksum: process.env.ZIPFILE_CHECKSUM || '',
 //   });
 
+// TODO: Determine if we really need a second stack
 // Create a second stack for CICD, etc.
-new ClusterStack(app, "ClusterStack", {
+/* new ClusterStack(app, "ClusterStack", {
   env: {
     region: process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION,
     account: process.env.AWS_ACCOUNT_ID,
@@ -33,3 +35,4 @@ new ClusterStack(app, "ClusterStack", {
   codeBuildRoleArn:
     process.env.BUILD_ROLE_ARN || "arn:aws:123456789012::iam:role/NOT_SET",
 });
+ */

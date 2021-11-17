@@ -1,6 +1,6 @@
-ZIPFILE ?= policy-as-code-workshop-stack-app.zip
+ZIPFILE ?= workshop-stack-app.zip
 S3_ASSET_BUCKET ?= ee-assets-prod-us-east-1
-S3_ASSET_PREFIX ?= modules/7381f5596f1840508211082c797067c0/v1/
+S3_ASSET_PREFIX ?= modules/7381f5596f1840508211082c797067c0/v2/
 #S3_ASSET_BUCKET ?= ee-assets-jaknn-sandbox
 #S3_ASSET_PREFIX ?= modules/local_testing/v1/
 S3_URL := s3://$(S3_ASSET_BUCKET)/$(S3_ASSET_PREFIX)$(ZIPFILE)
@@ -38,6 +38,7 @@ deploy: build upload
 		--parameters FoundationStack:EEAssetsBucket=$(S3_ASSET_BUCKET) \
 		--parameters FoundationStack:EEAssetsKeyPrefix=$(S3_ASSET_PREFIX) \
 		--parameters FoundationStack:SourceZipFile=$(ZIPFILE) \
+		--parameters FoundationStack:SourceZipURI=$(S3_URL) \
 		--parameters FoundationStack:SourceZipFileChecksum=$$(openssl sha256 -hex -r $(ZIPFILE) | cut -d' ' -f1)
 
 .PHONY: destroy

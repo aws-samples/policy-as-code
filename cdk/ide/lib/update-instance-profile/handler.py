@@ -13,7 +13,7 @@ helper = CfnResource(json_logging=False, log_level='DEBUG',
                      boto_level='CRITICAL', sleep_on_delete=120, ssl_verify=None)
 
 try:
-    ec2_client = boto3.client('ec2')
+    #ec2_client = boto3.client('ec2')
     ssm_client = boto3.client('ssm')
 except Exception as e:
     helper.init_failure(e)
