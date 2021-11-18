@@ -22,6 +22,7 @@ import {
 
 // Higher order constructs
 import * as cloud9 from "@aws-cdk/aws-cloud9-alpha";
+import * as pylambda from "@aws-cdk/aws-lambda-python-alpha";
 
 // CDK stuff
 import { Construct } from "constructs";
@@ -484,12 +485,13 @@ exports.handler = async function (event, context) {
     // Attach instance profile to the Cloud9 environment via Lambda backed custom resource
     // Thanks to maishsk@ for this code: https://gitlab.aws.dev/maishsk/cloud9-event-engine-cfn-template
 
-    const updateInstanceProfileFunction = new lambda.Function(
+    const updateInstanceProfileFunction = new pylambda.PythonFunction(
       this,
       "UpdateInstanceProfileFunction",
       {
-        code: lambda.Code.fromAsset(path.join(__dirname, "c9InstanceProfile")),
-        handler: "lambda_function.handler",
+        entry: path.join(__dirname, "../lambda_functions/c9InstanceProfile"),
+        index: "lambda_function.py",
+        handler: "handler",
         role: lambdaRole,
         runtime: lambda.Runtime.PYTHON_3_9,
         timeout: Duration.minutes(1),
@@ -516,12 +518,13 @@ exports.handler = async function (event, context) {
     // Resize the EBS volume attached to the Cloud9 EC2 instance
     // Thanks to maishsk@ for this code: https://gitlab.aws.dev/maishsk/cloud9-event-engine-cfn-template
 
-    const diskResizeFunction = new lambda.Function(
+    const diskResizeFunction = new pylambda.PythonFunction(
       this,
       "Cloud9DiskResizeFunction",
       {
-        code: lambda.Code.fromAsset(path.join(__dirname, "c9DiskResize")),
-        handler: "lambda_function.handler",
+        entry: path.join(__dirname, "../lambda_functions/c9DeskResize"),
+        index: "lambda_function.py",
+        handler: "handler",
         role: lambdaRole,
         runtime: lambda.Runtime.PYTHON_3_9,
         timeout: Duration.minutes(1),
@@ -548,12 +551,13 @@ exports.handler = async function (event, context) {
     // Finish configuring the Cloud9 environment, e.g. installing packages, running scripts
     // Thanks to maishsk@ for this code: https://gitlab.aws.dev/maishsk/cloud9-event-engine-cfn-template
 
-    const bootstrapFunction = new lambda.Function(
+    const bootstrapFunction = new pylambda.PythonFunction(
       this,
       "Cloud9BootstrapFunction",
       {
-        code: lambda.Code.fromAsset(path.join(__dirname, "c9bootstrap")),
-        handler: "lambda_function.handler",
+        entry: path.join(__dirname, "../lambda_functions/c9bootstrap"),
+        index: "lambda_function.py",
+        handler: "handler",
         role: lambdaRole,
         runtime: lambda.Runtime.PYTHON_3_9,
         timeout: Duration.minutes(1),

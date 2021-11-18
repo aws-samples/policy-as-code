@@ -23,9 +23,6 @@ clean:
 	find . -name '*.js' ! -name 'jest.config.js' -not -path './node_modules/*' -delete
 	find . -name '*.d.ts' -not -path './node_modules/*' -delete
 	rm -rf cdk.out/
-	rm -rf ./lib/c9DiskResize/package
-	rm -rf ./lib/c9InstanceProfile/package
-	rm -rf ./lib/c9bootstrap/package
 
 
 .PHONY: build
@@ -42,7 +39,7 @@ package-lambda:
 	cd ./lib/c9InstanceProfile && pip install -t . -r requirements.txt
 
 .PHONY: deploy
-deploy: build package-lambda upload
+deploy: build upload
 	npx cdk deploy FoundationStack --require-approval=never \
 		--previous-parameters=false \
 		--parameters FoundationStack:EEAssetsBucket=$(S3_ASSET_BUCKET) \

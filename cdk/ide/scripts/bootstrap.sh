@@ -19,6 +19,10 @@ source $HOME/.cargo/env
 cargo install cfn-guard
 $ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/aws-cloudformation/cloudformation-guard/main/install-guard.sh | sh
 
+# Configure Python virtual environment 
+python3 -m venv .env
+source .env/bin/activate
+
 #Install Checkov
 pip3 install checkov
 
@@ -31,6 +35,12 @@ mkdir ~/bin && tar xvzf regula_1.6.0_Linux_x86_64.tar.gz -C ~/bin regula
 
 #Install cfn-lint
 pip install cfn-lint
+
+# Deploy the pipeline for student exercises
+cd ~/environment/policy-as-code/cdk/cicd
+pip install -r requirements.txt
+cdk bootstrap
+cdk deploy --all --require-approval never
 
 #Examples of pulling 
 #aws s3 cp s3://ee-assets-prod-us-east-1/modules/2a60741f901644fa9b5b924e9b4ab918/v1/scripts/init.js /home/ec2-user/environment/.c9/metadata/environment/~/.c9/init.js
