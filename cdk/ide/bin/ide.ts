@@ -13,7 +13,6 @@ const app = new cdk.App();
 new FoundationStack(app, "FoundationStack", {
   sourceZipFile: process.env.ZIPFILE || "workshop-stack-app.zip",
   sourceZipFileChecksum: process.env.ZIPFILE_CHECKSUM || "",
-  sourceZipURI: process.env.S3_URL || "",
 });
 
 // See below for example when FoundationStack needs environment
