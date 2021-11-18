@@ -1,5 +1,5 @@
 ---
-title: "AWS CodePipeline Run"
+title: "CloudFormation Validation"
 weight: 20
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: "AWS Costs"
-weight: 5
+weight: 15
 ---
 This workshop will take approximately 2 hours to complete. It uses the following AWS services:
 - [AWS Cloud9 Pricing](https://aws.amazon.com/cloud9/pricing/)
