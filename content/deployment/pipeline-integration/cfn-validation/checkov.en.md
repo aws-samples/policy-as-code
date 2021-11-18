@@ -1,9 +1,9 @@
 ---
-title: "Remediate checkov"
+title: "Fix checkov findings"
 weight: 30
 ---
 
-## Remediate checkov rules violations
+## Remediate checkov rule violations
 1. The two issues flagged by [checkov](https://github.com/bridgecrewio/checkov) are as follows:
     * CKV_AWS_53: "Ensure S3 bucket has block public ACLS enabled"
     * CKV_AWS_19: "Ensure the S3 bucket has server-side-encryption enabled"

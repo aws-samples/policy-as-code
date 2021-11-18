@@ -1,0 +1,21 @@
+environment-id: ""
+exclude: []
+format: text
+input-type:
+- auto
+no-built-ins: true
+no-ignore: false
+only: []
+severity: unknown
+sync: false
+# environment-id: ""
+# exclude: []
+# format: text
+# include: []
+# input-type:
+#     - auto
+# inputs: []
+# no-ignore: false
+# only: []
+# severity: unknown
+# sync: false

@@ -1,9 +1,9 @@
 ---
-title: "Remediate cfn-guard"
+title: "Fix cfn-guard findings"
 weight: 40
 ---
 
-## Remediate cfn-guard rules violations
+## Remediate cfn-guard rule violations
 1. As from before replicate cfn-guard run in the local environment. Run the following commands to do that:
     :::code{showCopyAction=true showLineNumbers=false}
     cd ~/environment/policy-as-code/cdk/app;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
