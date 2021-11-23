@@ -1,5 +1,5 @@
 ---
-title: "Using Cloud Control API with cfn-guard"
+title: "CC API and cfn-guard"
 weight: 10
 ---
 
@@ -19,8 +19,8 @@ This section will explore the output of the AWS Cloud Control API as well as how
     {
         "TypeName": "AWS::S3::Bucket",
         "ResourceDescription": {
-            "Identifier": "policy-as-code-294124263825",
-            "Properties": "{\"PublicAccessBlockConfiguration\":{\"RestrictPublicBuckets\":true,\"BlockPublicPolicy\":true,\"BlockPublicAcls\":false,\"IgnorePublicAcls\":false},\"BucketName\":\"policy-as-code-294124263825\",\"RegionalDomainName\":\"policy-as-code-294124263825.s3.us-east-2.amazonaws.com\",\"DomainName\":\"policy-as-code-294124263825.s3.amazonaws.com\",\"BucketEncryption\":{\"ServerSideEncryptionConfiguration\":[{\"BucketKeyEnabled\":false,\"ServerSideEncryptionByDefault\":{\"SSEAlgorithm\":\"AES256\"}}]},\"WebsiteURL\":\"http://policy-as-code-294124263825.s3-website.us-east-2.amazonaws.com\",\"DualStackDomainName\":\"policy-as-code-294124263825.s3.dualstack.us-east-2.amazonaws.com\",\"VersioningConfiguration\":{\"Status\":\"Enabled\"},\"Arn\":\"arn:aws:s3:::policy-as-code-294124263825\",\"Tags\":[]}"
+            "Identifier": "policy-as-code-bucket83908e77-1hoazld23kjrb",
+            "Properties": "{\"PublicAccessBlockConfiguration\":{\"RestrictPublicBuckets\":true,\"BlockPublicPolicy\":true,\"BlockPublicAcls\":true,\"IgnorePublicAcls\":true},\"BucketName\":\"policy-as-code-bucket83908e77-1hoazld23kjrb\",\"RegionalDomainName\":\"policy-as-code-bucket83908e77-1hoazld23kjrb.s3.us-east-2.amazonaws.com\",\"DomainName\":\"policy-as-code-bucket83908e77-1hoazld23kjrb.s3.amazonaws.com\",\"WebsiteURL\":\"http://policy-as-code-bucket83908e77-1hoazld23kjrb.s3-website.us-east-2.amazonaws.com\",\"LifecycleConfiguration\":{\"Rules\":[{\"Status\":\"Enabled\",\"NoncurrentVersionTransition\":{\"StorageClass\":\"STANDARD_IA\",\"TransitionInDays\":31},\"NoncurrentVersionExpirationInDays\":180,\"TagFilters\":[null],\"Transition\":{\"StorageClass\":\"STANDARD_IA\",\"TransitionInDays\":60},\"NoncurrentVersionTransitions\":[],\"Id\":\"ZmQxMTA3N2MtZjYyMS00MTQ2LThmYmYtYzY3OWFiY2UwMzVi\",\"Prefix\":\"\",\"AbortIncompleteMultipartUpload\":{\"DaysAfterInitiation\":5}}]},\"DualStackDomainName\":\"policy-as-code-bucket83908e77-1hoazld23kjrb.s3.dualstack.us-east-2.amazonaws.com\",\"VersioningConfiguration\":{\"Status\":\"Enabled\"},\"Arn\":\"arn:aws:s3:::policy-as-code-bucket83908e77-1hoazld23kjrb\",\"Tags\":[{\"Value\":\"policy-as-code\",\"Key\":\"App\"}]}"
         }
     }
     ```
