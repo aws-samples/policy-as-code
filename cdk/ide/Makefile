@@ -4,7 +4,13 @@ ZIPFILE ?= workshop-stack-app.zip
 S3_ASSET_BUCKET ?= ee-assets-jaknn-sandbox
 S3_ASSET_PREFIX ?= modules/local_testing/v1/
 S3_URL := s3://$(S3_ASSET_BUCKET)/$(S3_ASSET_PREFIX)$(ZIPFILE)
-TEAM_ROLE_ARN := arn:aws:sts::103580932836:assumed-role/EngagementAdmin/jaknn-Isengard
+
+# Cloud9 memberships won't accept a role ARN - only an assume-role ARN
+# Cloud9 owner has to be the actual role ARN - so we need both
+TEAM_ROLE_NAME := EventEngineTesting
+TEAM_ROLE_ARN := arn:aws:iam::$(ACCOUNT_ID):role/$(TEAM_ROLE_NAME)
+TEAM_ROLE_SESSION_NAME := jaknn-Isengard  # This will be '/MasterKey' when running in Event Engine
+TEAM_ASSUMED_ROLE_ARN := arn:aws:iam::$(ACCOUNT_ID):assumed-role/$(TEAM_ROLE_NAME)/$(TEAM_ROLE_SESSION_NAME)
 
 .PHONY: upload
 upload: $(ZIPFILE)
@@ -12,6 +18,8 @@ upload: $(ZIPFILE)
 	aws s3 cp $(ZIPFILE) $(S3_URL)
 	aws s3 cp ./scripts/bootstrap.sh s3://$(S3_ASSET_BUCKET)/$(S3_ASSET_PREFIX)
 zip: $(ZIPFILE)
+
+$(ACCOUNT_ID): $(shell aws sts get-caller-identity --query 'Account')
 
 $(ZIPFILE): $(shell git ls-files)
 	rm -f $@
@@ -33,18 +41,13 @@ build:
 synth-bootstrap: build
 	npx cdk synth FoundationStack
 
-package-lambda:
-	cd ./lib/c9bootstrap && pip install -t . -r requirements.txt
-	cd ./lib/c9DiskResize && pip install -t . -r requirements.txt
-	cd ./lib/c9InstanceProfile && pip install -t . -r requirements.txt
-
 .PHONY: deploy
 deploy: build upload
 	npx cdk deploy FoundationStack --require-approval=never \
 		--previous-parameters=false \
 		--parameters FoundationStack:EEAssetsBucket=$(S3_ASSET_BUCKET) \
 		--parameters FoundationStack:EEAssetsKeyPrefix=$(S3_ASSET_PREFIX) \
-		--parameters FoundationStack:EETeamRoleArn=$(TEAM_ROLE_ARN) \
+		--parameters FoundationStack:EETeamRoleArn=$(TEAM_ASSUMED_ROLE_ARN) \
 		--parameters FoundationStack:SourceZipFile=$(ZIPFILE) \
 		--parameters FoundationStack:SourceZipFileChecksum=$$(openssl sha256 -hex -r $(ZIPFILE) | cut -d' ' -f1) 
 

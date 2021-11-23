@@ -5,7 +5,8 @@ import boto3
 from crhelper import CfnResource
 
 logger = logging.getLogger(__name__)
-helper = CfnResource(json_logging=True, log_level='DEBUG', boto_level='CRITICAL')
+helper = CfnResource(json_logging=True, log_level='DEBUG',
+                     boto_level='CRITICAL')
 
 try:
     ssm_client = boto3.client('ssm')
@@ -14,7 +15,8 @@ except Exception as e:
 
 
 def get_command_output(instance_id, command_id):
-    response = ssm_client.get_command_invocation(CommandId=command_id, InstanceId=instance_id)
+    response = ssm_client.get_command_invocation(
+        CommandId=command_id, InstanceId=instance_id)
     if response['Status'] in ['Pending', 'InProgress', 'Delayed']:
         return
     return response
@@ -55,7 +57,8 @@ def poll_create(event, context):
     instance_id = event["ResourceProperties"]["InstanceId"]
     while True:
         try:
-            cmd_output_response = get_command_output(instance_id, helper.Data["CommandId"])
+            cmd_output_response = get_command_output(
+                instance_id, helper.Data["CommandId"])
             if cmd_output_response:
                 break
         except ssm_client.exceptions.InvocationDoesNotExist:
@@ -64,7 +67,8 @@ def poll_create(event, context):
             return
         sleep(15)
     if cmd_output_response['StandardErrorContent']:
-        raise Exception("ssm command failed: " + cmd_output_response['StandardErrorContent'][:235])
+        raise Exception("ssm command failed: " +
+                        cmd_output_response['StandardErrorContent'][:235])
     return instance_id
 
 
