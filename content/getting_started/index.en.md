@@ -1,6 +1,6 @@
 ---
 title: "Getting Started"
-weight: 10
+weight: 12
 ---
 
 This section covers setting up your environment to work through the examples in this workshop.
