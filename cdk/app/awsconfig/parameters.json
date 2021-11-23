@@ -1,0 +1,12 @@
+{
+  "Version": "1.0",
+  "Parameters": {
+    "RuleName": "S3PublicAccessSettings",
+    "SourceRuntime": "python3.9",
+    "CodeKey": "S3PublicAccessSettings.zip",
+    "InputParameters": "{}",
+    "OptionalParameters": "{}",
+    "SourceEvents": "AWS::S3::Bucket"
+  },
+  "Tags": "[]"
+}

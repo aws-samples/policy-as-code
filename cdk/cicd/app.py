@@ -1,12 +1,12 @@
 from aws_cdk import (
-    core,
+    App
 )
 
 from Base import Base
 from Pipeline import Pipeline
 
 props = {'namespace': 'pac'}
-app = core.App()
+app = App()
 
 # stack for ecr, bucket, codebuild
 base = Base(app, f"{props['namespace']}-base", props)

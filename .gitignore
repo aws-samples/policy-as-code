@@ -1,3 +1,6 @@
 **/cdk/*/cdk.out/*
 **/cdk/*/*pycache*
 **.DS_store**
+**cfn-guard**
+**.terraform**
+cdk.context.json
