@@ -1,5 +1,5 @@
 ---
-title: "Cloud Control API"
+title: "Cloud Control API (CC API)"
 weight: 10
 ---
 
