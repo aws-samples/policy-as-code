@@ -47,10 +47,10 @@ This section using the work done in [AWS Config Custom Rule](/pac-action/ccapi/a
             )
     ```
 1. Commit the code to the git repo:
-```bash
-git commit -a -m "updated to deploy remediation with SSM document"
-git push
-```
+    ```bash
+    git commit -a -m "updated to deploy remediation with SSM document"
+    git push
+    ```
 1. Navigate to the S3 bucket and change the permissions for the *Block public access** as specified below:
     ![S3 Public Access to fix](/static/images/prerequisites/s3-public-access-fix.png)
 1. Save the changes and confirm that you want to make the changes to the S3 bucket permissions.
