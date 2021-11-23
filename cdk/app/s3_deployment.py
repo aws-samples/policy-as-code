@@ -86,3 +86,12 @@ class S3AppStack(Stack):
         # Adds a Tag Name->App, Value->policy-as-code
         for i in [bucket]:
             Tags.of(i).add('App', 'policy-as-code')
+
+        # Insert AWS Lambda Function for Custom AWS Config rule
+        # End of AWS Lambda Function
+        
+        # Insert AWS Config Custom Rule
+        # End of AWS Config Custom Rule
+        
+        # Insert Automation Role and CfnRemediationConfiguration
+        # End of Automation Role and CfnRemediationConfiguration
