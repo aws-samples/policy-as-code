@@ -1,6 +1,8 @@
 #!/bin/bash
 
 #Add commands here to taste.
+sudo ec2-user
+
 #HOME_DIR=$(cd "$(dirname "$0")/.." && pwd)
 HOME_DIR="/home/ec2-user"
 BIN_DIR="$HOME_DIR/bin"
@@ -39,13 +41,15 @@ cd $TMP_DIR
 #wget https://github.com/aws-cloudformation/cloudformation-guard/releases/download/v2.1.0-pre-rc1/cfn-guard-v2-ubuntu-latest.tar.gz
 
 # Build from source - slower. but works on Amazon Linux 2
-wget https://github.com/aws-cloudformation/cloudformation-guard/archive/refs/tags/v2.1.0-pre-rc1.zip
-unzip v2.1.0-pre-rc1.zip
-cd cloudformation-guard-2.1.0-pre-rc1/
-cd cfn-guard-v2-ubuntu-latest 
-RUSTFLAGS=-Awarnings ~/.cargo/bin/cargo build --release
-cp ./target/release/cfn-guard $BIN_DIR
+#wget https://github.com/aws-cloudformation/cloudformation-guard/archive/refs/tags/v2.1.0-pre-rc1.zip
+#unzip v2.1.0-pre-rc1.zip
+#cd cloudformation-guard-2.1.0-pre-rc1/
+#cd cfn-guard-v2-ubuntu-latest 
+#RUSTFLAGS=-Awarnings ~/.cargo/bin/cargo build --release
+#cp ./target/release/cfn-guard $BIN_DIR
 #cfn-guard --version
+
+# Grab Amazon Linux binary from EE assets bucket
 
 
 # Configure Python virtual environment 
@@ -54,7 +58,7 @@ python3 -m venv .env
 source .env/bin/activate
 
 #Install Checkov
-pip3 install checkov
+pip install checkov
 
 #Install Open Policy Agent CLI
 cd $BIN_DIR && curl -L -o opa https://openpolicyagent.org/downloads/v0.34.2/opa_linux_amd64_static && chmod 755 ./opa
@@ -73,16 +77,16 @@ source $HOME_DIR/.bashrc
 source $HOME_DIR/.bash_profile
 
 # Install CDK v1
-$BIN_DIR/npm install -g aws-cdk
-#cdk --version
+npm install -g aws-cdk
+cdk --version
 source $HOME_DIR/.bashrc
 source $HOME_DIR/.bash_profile
 
 # Deploy the pipeline for student exercises
-cd $HOME_DIR/environment/policy-as-code/cdk/cicd
-pip install -r requirements.txt
-cdk bootstrap
-cdk deploy --all --require-approval never
+#cd $HOME_DIR/environment/policy-as-code/cdk/cicd
+#pip install -r requirements.txt
+#cdk bootstrap
+#cdk deploy --all --require-approval never
 
 #Examples of pulling 
 #aws s3 cp s3://ee-assets-prod-us-east-1/modules/2a60741f901644fa9b5b924e9b4ab918/v1/scripts/init.js /home/ec2-user/environment/.c9/metadata/environment/~/.c9/init.js
