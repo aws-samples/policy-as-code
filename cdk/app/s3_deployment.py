@@ -1,11 +1,13 @@
 import aws_cdk.aws_s3
-from aws_cdk import (
+from aws_cdk.core import (
     # core,
     Stack,
     RemovalPolicy,
     Duration,
     Tags,
     App,
+    )
+from aws_cdk import (    
     aws_s3,
     aws_kms,
     aws_iam

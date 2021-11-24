@@ -1,4 +1,4 @@
-from aws_cdk import (
+from aws_cdk.core import (
     App,
     Environment,
 )
