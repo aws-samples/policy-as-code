@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Add commands here to taste.
-sudo ec2-user
+sudo -u ec2-user
 
 #HOME_DIR=$(cd "$(dirname "$0")/.." && pwd)
 HOME_DIR="/home/ec2-user"
@@ -21,7 +21,7 @@ mkdir -p $BIN_DIR
 mkdir -p $TMP_DIR
 
 #Clone the workshop repo
-cd $ENV_DIR;git clone https://github.com/aws-samples/policy-as-code.git
+#cd $ENV_DIR;git clone https://github.com/aws-samples/policy-as-code.git
 
 #Install Rust and Cargo
 #cd $HOME_DIR
