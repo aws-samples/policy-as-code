@@ -83,7 +83,7 @@ tar xvzf regula_2.1.0_Linux_x86_64.tar.gz -C $BIN_DIR regula
 #source $HOME_DIR/.bash_profile
 
 # Install CDK v1
-#npm install -g aws-cdk
+npm install -g aws-cdk@1.134.0 --force
 #cdk --version
 #source $HOME_DIR/.bashrc
 #source $HOME_DIR/.bash_profile
