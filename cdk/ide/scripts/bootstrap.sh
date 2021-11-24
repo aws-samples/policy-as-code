@@ -78,18 +78,19 @@ tar xvzf regula_1.6.0_Linux_x86_64.tar.gz -C $BIN_DIR regula
 #wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 #source $HOME_DIR/.bashrc
 #source $HOME_DIR/.bash_profile
+nvm install 16.3.0
 
 # Install CDK v1
-#npm install -g aws-cdk
+npm install -g aws-cdk
 #cdk --version
 #source $HOME_DIR/.bashrc
 #source $HOME_DIR/.bash_profile
 
 # Deploy the pipeline for student exercises
-#cd $HOME_DIR/environment/policy-as-code/cdk/cicd
-#pip install -r requirements.txt
-#cdk bootstrap
-#cdk deploy --all --require-approval never
+cd $HOME_DIR/environment/policy-as-code/cdk/cicd
+pip install -r requirements.txt
+cdk bootstrap
+cdk deploy --all --require-approval never
 
 #Examples of pulling 
 #aws s3 cp s3://ee-assets-prod-us-east-1/modules/2a60741f901644fa9b5b924e9b4ab918/v1/scripts/init.js /home/ec2-user/environment/.c9/metadata/environment/~/.c9/init.js
