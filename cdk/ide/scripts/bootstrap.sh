@@ -1,7 +1,8 @@
 #!/bin/bash
 
 #Add commands here to taste.
-sudo -u ec2-user
+# only switch to ec2-user if you are running from ssm run command otherwise cloud9 gives you an interactive shell
+#sudo su - ec2-user
 
 #HOME_DIR=$(cd "$(dirname "$0")/.." && pwd)
 HOME_DIR="/home/ec2-user"
