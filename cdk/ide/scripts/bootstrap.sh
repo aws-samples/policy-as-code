@@ -54,10 +54,12 @@ mkdir -p $TMP_DIR
 aws s3 cp s3://ee-assets-prod-us-east-1/modules/9a82be9ca37142d6905d3ed953047782/v1/cfn-guard $BIN_DIR/cfn-guard
 chmod +x $BIN_DIR/cfn-guard 
 
+# Install Python 3.8
+sudo amazon-linux-extras install python3.8
 
 # Configure Python virtual environment 
 cd $HOME_DIR
-python3 -m venv $HOME_DIR/.env
+python3.8 -m venv $HOME_DIR/.env
 source $HOME_DIR/.env/bin/activate
 
 #Install Checkov
@@ -71,8 +73,8 @@ cd $BIN_DIR && curl -L -o opa https://openpolicyagent.org/downloads/v0.34.2/opa_
 
 #Install Regula
 cd $TMP_DIR
-wget https://github.com/fugue/regula/releases/download/v1.6.0/regula_1.6.0_Linux_x86_64.tar.gz
-tar xvzf regula_1.6.0_Linux_x86_64.tar.gz -C $BIN_DIR regula
+wget https://github.com/fugue/regula/releases/download/v2.1.0/regula_2.1.0_Linux_x86_64.tar.gz
+tar xvzf regula_2.1.0_Linux_x86_64.tar.gz -C $BIN_DIR regula
 
 
 # Install NodeJS and NPM
