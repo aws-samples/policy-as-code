@@ -10,6 +10,24 @@ from aws_cdk import (
     aws_kms,
     aws_iam
 )
+from aws_cdk.aws_lambda import (
+    DockerImageFunction,
+    DockerImageCode,
+)
+from aws_cdk.aws_config import (
+    CustomRule,
+    CfnRemediationConfiguration,
+    RuleScope,
+    ResourceType
+)
+from aws_cdk.aws_iam import (
+    ManagedPolicy,
+    PolicyStatement,
+    PolicyDocument,
+    Role,
+    ServicePrincipal
+)
+import os
 
 
 class S3AppStack(Stack):
