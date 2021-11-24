@@ -8,15 +8,15 @@ To kickoff the deployment use git push to AWS CodeCommit which is the source for
 changed to comply with the rules specified in the AWS CodePipeline. Do the following:
 
 1. Clone the workshop repo (If this is not already done.):
-    :::code{showCopyAction=true showLineNumbers=false}
+    ```bash
     cd ~/environment/policy-as-code
-    :::
+    ```
 1. Remove the reference to the upstream code repo by issuing the command:
     :::code{showCopyAction=true showLineNumbers=false}
     git remote remove origin
     :::
 1. Get the repository clone URL by running the the following commands and adding it as our remote origin:
-    ```
+    ```bash
     export repo=$(aws codecommit list-repositories --output text | awk '{print $3}' | grep policy-as-code)
     export codecommiturl=$(aws codecommit get-repository --repository-name ${repo} --query 'repositoryMetadata.cloneUrlHttp'    --output text)
     git remote add origin ${codecommiturl}
