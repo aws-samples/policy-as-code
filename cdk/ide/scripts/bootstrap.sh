@@ -24,9 +24,9 @@ mkdir -p $TMP_DIR
 cd $ENV_DIR;git clone https://github.com/aws-samples/policy-as-code.git
 
 #Install Rust and Cargo
-cd $HOME_DIR
-curl https://sh.rustup.rs -sSf | sh -s -- -y
-source $HOME_DIR/.cargo/env
+#cd $HOME_DIR
+#curl https://sh.rustup.rs -sSf | sh -s -- -y
+#source $HOME_DIR/.cargo/env
 
 #Install cfn-guard
 # Latest official build - via Cargo
@@ -36,7 +36,7 @@ source $HOME_DIR/.cargo/env
 #$ curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/aws-cloudformation/cloudformation-guard/main/install-guard.sh | sh
 
 # Beta / RC build
-cd $TMP_DIR
+#cd $TMP_DIR
 # Binary - doesn't currently work on Amazon Linux 2 - fails with gclib version error
 #wget https://github.com/aws-cloudformation/cloudformation-guard/releases/download/v2.1.0-pre-rc1/cfn-guard-v2-ubuntu-latest.tar.gz
 
@@ -50,15 +50,20 @@ cd $TMP_DIR
 #cfn-guard --version
 
 # Grab Amazon Linux binary from EE assets bucket
+aws s3 cp s3://ee-assets-prod-us-east-1/modules/9a82be9ca37142d6905d3ed953047782/v1/cfn-guard $BIN_DIR/cfn-guard
+chmod +x $BIN_DIR/cfn-guard 
 
 
 # Configure Python virtual environment 
 cd $HOME_DIR
-python3 -m venv .env
-source .env/bin/activate
+python3 -m venv $HOME_DIR/.env
+source $HOME_DIR/.env/bin/activate
 
 #Install Checkov
 pip install checkov
+
+#Install cfn-lint
+pip install cfn-lint
 
 #Install Open Policy Agent CLI
 cd $BIN_DIR && curl -L -o opa https://openpolicyagent.org/downloads/v0.34.2/opa_linux_amd64_static && chmod 755 ./opa
@@ -68,19 +73,17 @@ cd $TMP_DIR
 wget https://github.com/fugue/regula/releases/download/v1.6.0/regula_1.6.0_Linux_x86_64.tar.gz
 tar xvzf regula_1.6.0_Linux_x86_64.tar.gz -C $BIN_DIR regula
 
-#Install cfn-lint
-pip install cfn-lint
 
 # Install NodeJS and NPM
-wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-source $HOME_DIR/.bashrc
-source $HOME_DIR/.bash_profile
+#wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+#source $HOME_DIR/.bashrc
+#source $HOME_DIR/.bash_profile
 
 # Install CDK v1
-npm install -g aws-cdk
-cdk --version
-source $HOME_DIR/.bashrc
-source $HOME_DIR/.bash_profile
+#npm install -g aws-cdk
+#cdk --version
+#source $HOME_DIR/.bashrc
+#source $HOME_DIR/.bash_profile
 
 # Deploy the pipeline for student exercises
 #cd $HOME_DIR/environment/policy-as-code/cdk/cicd
