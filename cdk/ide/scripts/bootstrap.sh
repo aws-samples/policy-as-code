@@ -64,8 +64,8 @@ source $HOME_DIR/.env/bin/activate
 
 # Install CDK python modules
 cd $HOME_DIR
-pip install -r ./environment/policy-as-code/cdk/app/requirements.txt
-pip install -r ./environment/policy-as-code/cdk/cicd/requirements.txt
+pip install -r $HOME_DIR/environment/policy-as-code/cdk/app/requirements.txt
+pip install -r $HOME_DIR/environment/policy-as-code/cdk/cicd/requirements.txt
 
 #Install Checkov
 pip install checkov
