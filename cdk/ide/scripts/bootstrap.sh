@@ -64,8 +64,8 @@ source $HOME_DIR/.env/bin/activate
 
 # Install CDK python modules
 cd $HOME_DIR
-pip install -r ./policy-as-code/cdk/requirements.txt
-pip install -r ./policy-as-code/cicd/requirements.txt
+pip install -r ./environment/policy-as-code/cdk/app/requirements.txt
+pip install -r ./environment/policy-as-code/cdk/cicd/requirements.txt
 
 #Install Checkov
 pip install checkov
@@ -81,6 +81,8 @@ cd $TMP_DIR
 wget https://github.com/fugue/regula/releases/download/v2.1.0/regula_2.1.0_Linux_x86_64.tar.gz
 tar xvzf regula_2.1.0_Linux_x86_64.tar.gz -C $BIN_DIR regula
 
+# Change directory to policy-as-code
+cd $HOME_DIR/environment/policy-as-code
 
 # Install NodeJS and NPM
 #wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
