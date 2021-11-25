@@ -62,6 +62,11 @@ cd $HOME_DIR
 python3.8 -m venv $HOME_DIR/.env
 source $HOME_DIR/.env/bin/activate
 
+# Install CDK python modules
+cd $HOME_DIR
+pip install -r ./policy-as-code/cdk/requirements.txt
+pip install -r ./policy-as-code/cicd/requirements.txt
+
 #Install Checkov
 pip install checkov
 
