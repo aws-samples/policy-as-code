@@ -6,14 +6,15 @@ evaluate-variables: true
 framework: all
 no-guide: false
 output: cli
-quiet: false
+#quiet: false
 repo-id: bridgecrew/sample-repo
-skip-fixes: true
-skip-framework: dockerfile
+skip-fixes: false
+#skip-framework: dockerfile
 skip-suppressions: false
 soft-fail: false
 skip-check:
   - CKV_AWS_33
   - CKV_AWS_18
+  - CKV_DOCKER*
 soft-fail-on:
   - CKV_AWS_18

@@ -55,7 +55,7 @@ aws s3 cp s3://ee-assets-prod-us-east-1/modules/9a82be9ca37142d6905d3ed953047782
 chmod +x $BIN_DIR/cfn-guard 
 
 # Install Python 3.8
-sudo amazon-linux-extras install python3.8
+sudo amazon-linux-extras install python38
 
 # Configure Python virtual environment 
 cd $HOME_DIR
@@ -83,7 +83,7 @@ tar xvzf regula_2.1.0_Linux_x86_64.tar.gz -C $BIN_DIR regula
 #source $HOME_DIR/.bash_profile
 
 # Install CDK v1
-#npm install -g aws-cdk
+npm install -g aws-cdk@1.134.0 --force
 #cdk --version
 #source $HOME_DIR/.bashrc
 #source $HOME_DIR/.bash_profile
