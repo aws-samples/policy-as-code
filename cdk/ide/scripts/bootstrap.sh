@@ -55,7 +55,7 @@ aws s3 cp s3://ee-assets-prod-us-east-1/modules/9a82be9ca37142d6905d3ed953047782
 chmod +x $BIN_DIR/cfn-guard 
 
 # Install Python 3.8
-sudo amazon-linux-extras install python3.8
+sudo amazon-linux-extras install python38
 
 # Configure Python virtual environment 
 cd $HOME_DIR
