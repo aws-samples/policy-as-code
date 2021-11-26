@@ -513,7 +513,7 @@ weight: 40
         bucket_key_enabled=True,
         ...
     ```
-    Finally remove the line **encryption=aws_s3.BucketEncryption.S3_MANAGED,** and uncomment **encryption=aws_s3.BucketEncryption.KMS,**:
+    Remove the line **encryption=aws_s3.BucketEncryption.S3_MANAGED,** and uncomment **encryption=aws_s3.BucketEncryption.KMS,**:
     ```
         ...
         # Once you define the KMS key uncomment encryption=aws_s3.BucketEncryption.KMS attribute
@@ -533,6 +533,20 @@ weight: 40
             
         # Uncommment to make checkov pass
         ...
+    ```
+    Finally, make sure the S3 bucket is using the KMS key that is created. Look for the commented line that looks like this:
+    ```
+        ...
+        # Once you define the KMS key uncomment encryption_key=kms_key attribute
+        # encryption_key=kms_key, 
+        ...
+    ```
+    Uncomment the line **encryption_key=kms_key** it will look like this:
+    ```
+    ...
+    # Once you define the KMS key uncomment encryption_key=kms_key attribute
+    encryption_key=kms_key, 
+    ...
     ```
     These changes to S3 bucket with in CDK is needed to configure the S3 with the KMS key that will be created. Save the file in Cloud9 under menu File->Save.
 1. Validate the code by running:
