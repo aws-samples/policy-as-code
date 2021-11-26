@@ -543,10 +543,10 @@ weight: 40
     ```
     Uncomment the line **encryption_key=kms_key** it will look like this:
     ```
-    ...
-    # Once you define the KMS key uncomment encryption_key=kms_key attribute
-    encryption_key=kms_key, 
-    ...
+        ...
+        # Once you define the KMS key uncomment encryption_key=kms_key attribute
+        encryption_key=kms_key, 
+        ...
     ```
     These changes to S3 bucket with in CDK is needed to configure the S3 with the KMS key that will be created. Save the file in Cloud9 under menu File->Save.
 1. Validate the code by running:
