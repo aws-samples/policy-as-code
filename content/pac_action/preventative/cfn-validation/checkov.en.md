@@ -8,13 +8,13 @@ weight: 30
     * CKV_AWS_53: "Ensure S3 bucket has block public ACLS enabled"
     * CKV_AWS_19: "Ensure the S3 bucket has server-side-encryption enabled"
 1. To validate the same issue locally. Run the following commands:
-   :::code{showCopyAction=true showLineNumbers=false}
+  ```bash
    # Commands to setup CDK app locally, generate cfn template, and validate with checkov
    cd ~/environment/policy-as-code/cdk/app/
    pip install -r requirements.txt
    cdk synth
    checkov --directory cdk.out --config-file ./rules/checkov/checkov-config.yml
-   :::
+   ```
 1. Verify that the same issues that checkov flagged in codebuild exists in the local environment.
 1. CDK generated the CFN template that is in violation. Examine the CFN template by opening the file **cdk.out/policy-as-code.template.json** in the Cloud9 IDE:
     ![PolicyAsCodeTmpl](/static/PolicyAsCodeTmpl.png)
@@ -61,9 +61,10 @@ weight: 30
     Save the file in Cloud9 editor by clicking on **File**
     ![S3DeploymentFileSave.png](/static/S3DeploymentFileSave.png)
 1. Run the following commands to see if the code change will fix this:
-   :::code{showCopyAction=true showLineNumbers=false}
-   cdk synth; checkov --directory cdk.out --config-file ./rules/checkov/checkov-config.yml
-   :::
+   ```bash
+   cdk synth
+   checkov --directory cdk.out --config-file ./rules/checkov/checkov-config.yml
+   ```
 1. At this point there should only be one issue with checkov:
    ```
    ...
@@ -111,9 +112,10 @@ weight: 30
         ...
     ```
     Save the file in Cloud9 and run:
-    :::code{showCopyAction=true showLineNumbers=false}
-    cd ~/environment/policy-as-code/cdk/app/; cdk synth
-    :::
+    ```bash
+    cd ~/environment/policy-as-code/cdk/app/
+    cdk synth
+    ```
     Open the file **cdk.out/policy-as-code.template.json** and inspect the CFN template:
     ```
     ...
@@ -144,9 +146,10 @@ weight: 30
     ```
     The CFN Template has the **BucketEncryption** property set.
 1. Run checkov to validate the template:
-    :::code{showCopyAction=true showLineNumbers=false}
-    cd ~/environment/policy-as-code/cdk/app/;checkov --directory cdk.out --config-file ./rules/checkov/checkov-config.yml
-    :::
+    ```bash
+    cd ~/environment/policy-as-code/cdk/app/
+    checkov --directory cdk.out --config-file ./rules/checkov/checkov-config.yml
+    ```
     The output should look like this, with all 8 tests passing:
     ```
     cloudformation scan results:
@@ -194,9 +197,11 @@ weight: 30
             Guide: https://docs.bridgecrew.io/docs/s3_16-enable-versioning
     ``` 
 1. Commit the changes to the repo and push to the source CodeCommit repo to kick of the pipeline.
-    :::code{showCopyAction=true showLineNumbers=false}
-    cd ~/environment/policy-as-code/;git commit -a -m "fix checkov violations in s3_deployment.py";git push
-    :::
+    ```bash
+    cd ~/environment/policy-as-code/
+    git commit -a -m "fix checkov violations in s3_deployment.py"
+    git push
+    ```
 1. View the CodePipeline in your account. Instructions to do that is [here](https://docs.aws.amazon.com/codepipeline/latest/userguide/pipelines-view-console.html#pipelines-list-console.). Give it about a minute to restart. Verify that the checkov rules have passed but that the cfn-guard rules are now failing. Your CodePipeline will fail on the stage **ScanDeploy** stage. Click on the **Details** on the Scan - AWS CodeBuild.
     ![ScanDeployFailed](/static/ScanDeployFailed.png)
 1. You'll get a pop box that looks like below. Click on **Link to execution details**:

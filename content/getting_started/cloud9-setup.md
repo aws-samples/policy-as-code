@@ -1,6 +1,6 @@
 ---
 title: "Cloud9 Environment Setup"
-weight: 31
+weight: 32
 ---
 This section will cover attaching the IAM instance profile to the AWS Cloud9 Environment, resizing the volume, and installing needed tools. 
 
@@ -105,15 +105,7 @@ This section will cover attaching the IAM instance profile to the AWS Cloud9 Env
     ```
 1. If your are using **Using your Own AWS Account** run the following command, skip to the next step if you are using **AWS Hosted Event** account:
     - Clone the policy-as-code repository from github in the environment directory:
-      :::code{showCopyAction=true showLineNumbers=false}
-      cd ~/environment;git clone https://github.com/aws-samples/policy-as-code.git
-      :::
-    - Install the AWS CodePipeline as follows:
       ```bash
-      cd ~/environment/policy-as-code/cdk/cicd
-      pip install -r requirements.txt
-      cdk bootstrap
-      cdk deploy --all
+      cd ~/environment
+      git clone https://github.com/aws-samples/policy-as-code.git
       ```
-    - Answer 'y' to all prompts.
-1. Remove **AdministratorAccess** from the IAM role **PolicyAsCodeRole**.

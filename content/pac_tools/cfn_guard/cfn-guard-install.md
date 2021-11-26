@@ -2,19 +2,11 @@
 title: "Installing cfn-guard"
 weight: 10
 ---
-This section provides instruction on installation of cfn-guard 2.0
+This section provides instruction on installation of cfn-guard.
 
-1. Install [Rust](https://www.rust-lang.org/tools/install)
-    :::code{showCopyAction=true showLineNumbers=false}
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh;source ~/.bash_profile
-    :::
-    Choose "1) Proceed with installation (default)" or hit enter.
+::alert[If you are using a AWS Hosted Event to do this workshop, this step is not necessary! Only do this step if you elected not to run the bootstrap.sh script.]
+
 1. cfn-guard - [Installing cfn-guard](https://github.com/aws-cloudformation/cloudformation-guard#installation)
-    ```
-    git clone https://github.com/dchakrav-github/cloudformation-guard
-    cd cloudformation-guard
-    git switch parameterized-rules
-    cargo build --release
-    mkdir -p ~/bin;cp ./target/release/cfn-guard ~/bin
-    cfn-guard --version
+    ```bash
+    curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/aws-cloudformation/cloudformation-guard/main/install-guard.sh | sh
     ```

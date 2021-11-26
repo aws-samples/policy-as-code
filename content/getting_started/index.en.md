@@ -10,4 +10,4 @@ Start at [Using your Own AWS Account](/getting-started/own-aws-account)
 
 ## AWS Hosted Event
 * Obtain the **Event Hash** for [AWS Event Engine](https://dashboard.eventengine.run/login)
-* Go to [Cloud9 Environment Setup](/getting-started/cloud9-setup)
+* Go to [Installing the Tools and the AWS CodePipeline](/getting-started/tool-installation)

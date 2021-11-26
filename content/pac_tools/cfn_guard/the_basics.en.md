@@ -24,13 +24,12 @@ You must specify a `query` and an `operator` in the clause section:
 
 Let's try out a few clauses, first create a directory name **clauses_demo** and `cd` into it:
 
-
-:::code{showCopyAction=true showLineNumbers=false language=shell}
-mkdir clauses_demo; cd clauses_demo
-:::
+```bash
+mkdir clauses_demo
+cd clauses_demo
+```
 
 Next let's create sample cloudformation template that we can work with. Create a file name **rds_demo.yaml** with the following contents:
-
 
 :::code{showCopyAction=true showLineNumbers=false}
 Resources:
