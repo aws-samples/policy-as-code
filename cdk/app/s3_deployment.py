@@ -60,6 +60,7 @@ class S3AppStack(Stack):
 
                                # Once you define the KMS key uncomment encryption_key=kms_key attribute
                                # encryption_key=kms_key,
+
                                lifecycle_rules=[
                                    aws_s3.LifecycleRule(
                                        enabled=True,
