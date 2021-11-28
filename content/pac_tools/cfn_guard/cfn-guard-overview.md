@@ -1,5 +1,5 @@
 ---
-title: "Installing cfn-guard"
+title: "Overview"
 weight: 10
 ---
 This section provides instruction on installation of cfn-guard.
