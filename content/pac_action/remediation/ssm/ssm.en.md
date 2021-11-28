@@ -3,7 +3,7 @@ title: "Setting up Remediation"
 weight: 10
 ---
 
-This section using the work done in [AWS Config Custom Rule](/pac-action/ccapi/awsconfig)
+This section uses the work done in [AWS Config Custom Rule](/pac-action/detective/ccapi/awsconfig)
 
 1. Find the section in the file **s3_deployment.py** with the following comments:
     ```

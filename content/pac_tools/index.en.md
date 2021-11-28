@@ -1,5 +1,5 @@
 ---
-title: "Policy as Code Tools"
+title: "The Tools"
 weight: 15
 ---
 This section describes the Policy as Code tools covered in this workshop. It provides installation gudiance as well as basic language syntax.
