@@ -5,9 +5,11 @@ weight: 40
 
 ## Remediate cfn-guard rule violations
 1. As from before replicate cfn-guard run in the local environment. Run the following commands to do that:
-    :::code{showCopyAction=true showLineNumbers=false}
-    cd ~/environment/policy-as-code/cdk/app;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
-    :::
+    ```bash
+    cd ~/environment/policy-as-code/cdk/app
+    cdk synth
+    cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
+    ```
 
     Below is what cfn-guard should output, this will look similiar to what is in the CodeBuild logs:
     ```
@@ -23,9 +25,8 @@ weight: 40
     FAILED rules
     s3/bucket_policies.guard/check_all_s3_buckets_have_policy                   FAIL
     ---
-    `- File(, Status=FAIL)[Context=File(rules=3)]
-    |- Rule(check_all_s3_buckets_have_policy, Status=FAIL)[Context=check_all_s3_buckets_have_policy]
-    |  `- Check was not compliant as variable in context [ %s3_policy_bucket_refs not EMPTY  ] was not empty. Message [Bucket policies must be defined within the same stack template]
+    Evaluating data cdk.out/policy-as-code.template.json against rules s3/bucket_policies.guard
+    Number of non-compliant resources 0
     cdk.out/policy-as-code.template.json Status = PASS
     PASS rules
     s3/bucket_public_exposure.guard/deny_s3_access_control           PASS
@@ -42,11 +43,54 @@ weight: 40
     FAILED rules
     s3/bucket_server_side_encryption.guard/check_s3_sse_kms_only                FAIL
     ---
-    `- File(, Status=FAIL)[Context=File(rules=3)]
-    |- Rule(check_s3_sse_kms_only, Status=FAIL)[Context=check_s3_sse_kms_only]
-    |  `- Rule(check_s3_sse_kms, Status=FAIL)[Context=check_s3_sse_kms]
-    |     `- Check was not compliant as property value [Path=/Resources/Bucket83908E77/Properties/BucketEncryption/ServerSideEncryptionConfiguration/0/ServerSideEncryptionByDefault/SSEAlgorithm, Value="AES256"] not equal to value [Path=, Value="aws:kms"]. Message = [Algorithm must be set of 'aws:kms']
-    |     `- Check was not compliant as property [KMSMasterKeyID] is missing. Value traversed to [Path=/Resources/Bucket83908E77/Properties/BucketEncryption/ServerSideEncryptionConfiguration/0/ServerSideEncryptionByDefault, Value={"SSEAlgorithm":"AES256"}]. Message = [KMS Key must be set]
+    Evaluating data cdk.out/policy-as-code.template.json against rules s3/bucket_server_side_encryption.guard
+    Number of non-compliant resources 1
+    Resource = Bucket83908E77 {
+      Type      = AWS::S3::Bucket
+      CDK-Path  = policy-as-code/Bucket/Resource
+      Rule = check_s3_sse_kms_only {
+        ALL {
+          Rule = check_s3_sse_kms {
+            Message= S3 bucket did not have Server Side Encryption turned on with only KMS keys
+            ALL {
+              Check =  SSEAlgorithm EQUALS  "aws:kms" {
+                ComparisonError {
+                  Message         = Algorithm must be set of 'aws:kms'
+                  Error           = Check was not compliant as property value [Path=/Resources/Bucket83908E77/Properties/BucketEncryption/ServerSideEncryptionConfiguration/0/ServerSideEncryptionByDefault/SSEAlgorithm[L:10,C:32] Value="AES256"] not equal to value [Path=[L:0,C:0] Value="aws:kms"].
+                  PropertyPath    = /Resources/Bucket83908E77/Properties/BucketEncryption/ServerSideEncryptionConfiguration/0/ServerSideEncryptionByDefault/SSEAlgorithm[L:10,C:32]
+                  Operator        = EQUAL
+                  Value           = "AES256"
+                  ComparedWith    = "aws:kms"
+                  Code:
+                        8.            {
+                        9.              "ServerSideEncryptionByDefault": {
+                       10.                "SSEAlgorithm": "AES256"
+                       11.              }
+                       12.            }
+                       13.          ]
+
+                }
+              }
+              Check =  KMSMasterKeyID not EMPTY   {
+                Message= KMS Key must be set
+                RequiredPropertyError {
+                  PropertyPath = /Resources/Bucket83908E77/Properties/BucketEncryption/ServerSideEncryptionConfiguration/0/ServerSideEncryptionByDefault[L:9,C:47]
+                  MissingProperty = KMSMasterKeyID
+                  Reason = Could not find key KMSMasterKeyID inside struct at path /Resources/Bucket83908E77/Properties/BucketEncryption/ServerSideEncryptionConfiguration/0/ServerSideEncryptionByDefault[L:9,C:47]
+                  Code:
+                        7.          "ServerSideEncryptionConfiguration": [
+                        8.            {
+                        9.              "ServerSideEncryptionByDefault": {
+                       10.                "SSEAlgorithm": "AES256"
+                       11.              }
+                       12.            }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
     ```
 1. The first issue that fails is:
     ```
@@ -77,9 +121,11 @@ weight: 40
     ```
     Save the file using Cloud9 menu File->Save
 1. Validate the code by running:
-    :::code{showCopyAction=true showLineNumbers=false}
-    cd ~/environment/policy-as-code/cdk/app;cdk synth;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
-    :::
+    ```bash
+    cd ~/environment/policy-as-code/cdk/app
+    cdk synth
+    cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
+    ```
     Although the s3 bucket policies:
     ```
     PASS rules
@@ -95,34 +141,34 @@ weight: 40
     causing it to fail is the rule that it calls **check_unencrypted_deny_statement**
     ```
     ...
-   - Rule(check_s3_buckets_have_deny_for_unencrypted_puts, Status=FAIL)[Context=check_s3_buckets_have_deny_for_unencrypted_puts]
-      `- Disjunction(Status = FAIL)[Context=cfn_guard::rules::exprs::GuardClause#disjunction]
-         |- Rule(check_unencrypted_deny_statement, Status=FAIL)[Context=check_unencrypted_deny_statement]
-         |  `- Disjunction(Status = FAIL)[Context=cfn_guard::rules::exprs::RuleClause#disjunction]
-         |     |- Rule(check_sse, Status=FAIL)[Context=check_sse]
-         |     |  `- Disjunction(Status = FAIL)[Context=cfn_guard::rules::exprs::RuleClause#disjunction]
-         |     |     `- Check was not compliant as property [StringNotEqualsIfExists.%key] to compare from is missing. Value traversed to [Path=/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition, Value={"Bool":{"aws:SecureTransport":"false"}}].
-         |     |     `- Rule(check_null_string_not_eq_combo, Status=FAIL)[Context=check_null_string_not_eq_combo]
-         |     |        `- Check was not compliant as property [StringNotEquals.%key] to compare from is missing. Value traversed to [Path=/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition, Value={"Bool":{"aws:SecureTransport":"false"}}]. Message = [ DENY statement does not contain any StringNotEquals Condition to match value ]
-         |     |        `- Check was not compliant as property [/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition/Bool] was not empty. Message = [ DENY statement must contain only one StringNotEquals key ]
-         |     |        `- Check was not compliant as property [Null.%key] to compare from is missing. Value traversed to [Path=/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition, Value={"Bool":{"aws:SecureTransport":"false"}}]. Message = [ DENY statement does not contain any Null checks == true ]
-         |     |        `- Check was not compliant as property [/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition/Bool] was not empty. Message = [ DENY statement mut contain only one Null key ]
-         |     |- Rule(check_sse, Status=FAIL)[Context=check_sse]
-         |     |  `- Disjunction(Status = FAIL)[Context=cfn_guard::rules::exprs::RuleClause#disjunction]
-         |     |     `- Check was not compliant as property [StringNotEqualsIfExists.%key] to compare from is missing. Value traversed to [Path=/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition, Value={"Bool":{"aws:SecureTransport":"false"}}].
-         |     |     `- Rule(check_null_string_not_eq_combo, Status=FAIL)[Context=check_null_string_not_eq_combo]
-         |     |        `- Check was not compliant as property [StringNotEquals.%key] to compare from is missing. Value traversed to [Path=/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition, Value={"Bool":{"aws:SecureTransport":"false"}}]. Message = [ DENY statement does not contain any StringNotEquals Condition to match value ]
-         |     |        `- Check was not compliant as property [/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition/Bool] was not empty. Message = [ DENY statement must contain only one StringNotEquals key ]
-         |     |        `- Check was not compliant as property [Null.%key] to compare from is missing. Value traversed to [Path=/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition, Value={"Bool":{"aws:SecureTransport":"false"}}]. Message = [ DENY statement does not contain any Null checks == true ]
-         |     |        `- Check was not compliant as property [/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition/Bool] was not empty. Message = [ DENY statement mut contain only one Null key ]
-         |     `- Rule(check_kms_id, Status=FAIL)[Context=check_kms_id]
-         |        `- Disjunction(Status = FAIL)[Context=cfn_guard::rules::exprs::RuleClause#disjunction]
-         |           `- Check was not compliant as property [StringNotEqualsIfExists.%key] is missing. Value traversed to [Path=/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition, Value={"Bool":{"aws:SecureTransport":"false"}}].
-         |           `- Rule(check_null_string_not_eq_combo, Status=FAIL)[Context=check_null_string_not_eq_combo]
-         |              `- Check was not compliant as property [StringNotEquals.%key] to compare from is missing. Value traversed to [Path=/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition, Value={"Bool":{"aws:SecureTransport":"false"}}]. Message = [ DENY statement does not contain any StringNotEquals Condition to match value ]
-         |              `- Check was not compliant as property [/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition/Bool] was not empty. Message = [ DENY statement must contain only one StringNotEquals key ]
-         |              `- Check was not compliant as property [Null.%key] to compare from is missing. Value traversed to [Path=/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition, Value={"Bool":{"aws:SecureTransport":"false"}}]. Message = [ DENY statement does not contain any Null checks == true ]
-         |              `- Check was not compliant as property [/Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition/Bool] was not empty. Message = [ DENY statement mut contain only one Null key ]
+    Evaluating data cdk.out/policy-as-code.template.json against rules s3/bucket_policies.guard
+    Number of non-compliant resources 1
+    Resource = BucketPolicyE9A3008A {
+      Type      = AWS::S3::BucketPolicy
+      CDK-Path  = policy-as-code/Bucket/Policy/Resource
+      Rule = check_s3_buckets_have_deny_for_unencrypted_puts {
+        ALL {
+          ANY {
+            Rule = check_unencrypted_deny_statement {
+              ALL {
+                ANY {
+                  Rule = check_sse {
+                    ALL {
+                      ANY {
+                        Check =  Condition.StringNotEqualsIfExists.%key IN  %value {
+                          RequiredPropertyError {
+                            PropertyPath = /Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition[L:70,C:27]
+                            MissingProperty = StringNotEqualsIfExists.%key
+                            Reason = Could not find key StringNotEqualsIfExists inside struct at path /Resources/BucketPolicyE9A3008A/Properties/PolicyDocument/Statement/0/Condition[L:70,C:27]
+                            Code:
+                                 68.            {
+                                 69.              "Action": "s3:*",
+                                 70.              "Condition": {
+                                 71.                "Bool": {
+                                 72.                  "aws:SecureTransport": "false"
+                                 73.                }
+                          }
+                        }
     ...
     ```
     Inspect the rules file by opening **./policy-as-code/cdk/app/rules/cfn-guard/s3/bucket_policies.guard**. Find the rule **check_unencrypted_deny_statement** and examine the clauses:
@@ -282,9 +328,11 @@ weight: 40
     ```
     Save this file in Cloud9 with the menu File->Save.
 1. Validate the code by running:
-    :::code{showCopyAction=true showLineNumbers=false}
-    cd ~/environment/policy-as-code/cdk/app;cdk synth;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
-    :::
+    ```bash
+    cd ~/environment/policy-as-code/cdk/app
+    cdk synth
+    cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
+    ```
     The output after cfn-guard runs should look like this:
     ```
     cdk.out/policy-as-code.template.json Status = SKIP
@@ -314,11 +362,54 @@ weight: 40
     FAILED rules
     s3/bucket_server_side_encryption.guard/check_s3_sse_kms_only                FAIL
     ---
-    `- File(, Status=FAIL)[Context=File(rules=3)]
-       |- Rule(check_s3_sse_kms_only, Status=FAIL)[Context=check_s3_sse_kms_only]
-       |  `- Rule(check_s3_sse_kms, Status=FAIL)[Context=check_s3_sse_kms]
-       |     `- Check was not compliant as property value [Path=/Resources/Bucket83908E77/Properties/   BucketEncryption/ServerSideEncryptionConfiguration/0/ServerSideEncryptionByDefault/SSEAlgorithm,   Value="AES256"] not equal to value [Path=, Value="aws:kms"]. Message = [Algorithm must be set of  'aws:kms']
-       |     `- Check was not compliant as property [KMSMasterKeyID] is missing. Value traversed to [Path=/ Resources/Bucket83908E77/Properties/BucketEncryption/ServerSideEncryptionConfiguration/0/    ServerSideEncryptionByDefault, Value={"SSEAlgorithm":"AES256"}]. Message = [KMS Key must be set]
+    Evaluating data cdk.out/policy-as-code.template.json against rules s3/bucket_server_side_encryption.guard
+    Number of non-compliant resources 1
+    Resource = Bucket83908E77 {
+      Type      = AWS::S3::Bucket
+      CDK-Path  = policy-as-code/Bucket/Resource
+      Rule = check_s3_sse_kms_only {
+        ALL {
+          Rule = check_s3_sse_kms {
+            Message= S3 bucket did not have Server Side Encryption turned on with only KMS keys
+            ALL {
+              Check =  SSEAlgorithm EQUALS  "aws:kms" {
+                ComparisonError {
+                  Message         = Algorithm must be set of 'aws:kms'
+                  Error           = Check was not compliant as property value [Path=/Resources/Bucket83908E77/Properties/BucketEncryption/ServerSideEncryptionConfiguration/0/ServerSideEncryptionByDefault/SSEAlgorithm[L:10,C:32] Value="AES256"] not equal to value [Path=[L:0,C:0] Value="aws:kms"].
+                  PropertyPath    = /Resources/Bucket83908E77/Properties/BucketEncryption/ServerSideEncryptionConfiguration/0/ServerSideEncryptionByDefault/SSEAlgorithm[L:10,C:32]
+                  Operator        = EQUAL
+                  Value           = "AES256"
+                  ComparedWith    = "aws:kms"
+                  Code:
+                        8.            {
+                        9.              "ServerSideEncryptionByDefault": {
+                       10.                "SSEAlgorithm": "AES256"
+                       11.              }
+                       12.            }
+                       13.          ]
+
+                }
+              }
+              Check =  KMSMasterKeyID not EMPTY   {
+                Message= KMS Key must be set
+                RequiredPropertyError {
+                  PropertyPath = /Resources/Bucket83908E77/Properties/BucketEncryption/ServerSideEncryptionConfiguration/0/ServerSideEncryptionByDefault[L:9,C:47]
+                  MissingProperty = KMSMasterKeyID
+                  Reason = Could not find key KMSMasterKeyID inside struct at path /Resources/Bucket83908E77/Properties/BucketEncryption/ServerSideEncryptionConfiguration/0/ServerSideEncryptionByDefault[L:9,C:47]
+                  Code:
+                        7.          "ServerSideEncryptionConfiguration": [
+                        8.            {
+                        9.              "ServerSideEncryptionByDefault": {
+                       10.                "SSEAlgorithm": "AES256"
+                       11.              }
+                       12.            }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
     ```
     The rule **s3/bucket_server_side_encryption.guard/check_s3_sse_kms_only** is not satisfied because it expects the S3 property **BucketEncryption** property to use AWS KMS-managed keys(SSE-KMS). Examine the CFN template to see what is currently configured for **BucketEncryption**, open the file **./policy-as-code/cdk/app/cdk.out/policy-as-code.template.json** the following is what is currently configured:
     ```
@@ -422,7 +513,7 @@ weight: 40
         bucket_key_enabled=True,
         ...
     ```
-    Finally remove the line **encryption=aws_s3.BucketEncryption.S3_MANAGED,** and uncomment **encryption=aws_s3.BucketEncryption.KMS,**:
+    Remove the line **encryption=aws_s3.BucketEncryption.S3_MANAGED,** and uncomment **encryption=aws_s3.BucketEncryption.KMS,**:
     ```
         ...
         # Once you define the KMS key uncomment encryption=aws_s3.BucketEncryption.KMS attribute
@@ -443,14 +534,29 @@ weight: 40
         # Uncommment to make checkov pass
         ...
     ```
+    Finally, make sure the S3 bucket is using the KMS key that is created. Look for the commented line that looks like this:
+    ```
+        ...
+        # Once you define the KMS key uncomment encryption_key=kms_key attribute
+        # encryption_key=kms_key, 
+        ...
+    ```
+    Uncomment the line **encryption_key=kms_key** it will look like this:
+    ```
+        ...
+        # Once you define the KMS key uncomment encryption_key=kms_key attribute
+        encryption_key=kms_key, 
+        ...
+    ```
     These changes to S3 bucket with in CDK is needed to configure the S3 with the KMS key that will be created. Save the file in Cloud9 under menu File->Save.
 1. Validate the code by running:
-    :::code{showCopyAction=true showLineNumbers=false}
-    cd ~/environment/policy-as-code/cdk/app;cdk synth;cdk synth;cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
-    :::
+    ```bash
+    cd ~/environment/policy-as-code/cdk/app
+    cdk synth
+    cfn-guard validate -r rules/cfn-guard -d cdk.out/policy-as-code.template.json --show-summary all
+    ```
     The output after cfn-guard runs should look like this:
     ```
-    cdk.out/policy-as-code.template.json Status = PASS
     PASS rules
     kms/kms.guard/deny_kms_key_being_used_outside_account    PASS
     kms/kms.guard/deny_kms_key_without_key_rotation          PASS
@@ -474,11 +580,13 @@ weight: 40
     s3/bucket_server_side_encryption.guard/check_s3_sse_is_enabled              PASS
     s3/bucket_server_side_encryption.guard/check_s3_sse_kms_only                PASS
     s3/bucket_server_side_encryption.guard/check_s3_sse_kms_local_stack_only    PASS
+    ---
     ```
     Congratulations! At this point the AWS CodePipeline should be able to deploy the S3 CDK application with no issues. Run the following command:
-    :::code{showCopyAction=true showLineNumbers=false}
-    git commit -a -m "fixed issues with S3 CDK and now complies with cfn-guard rules";git push
-    :::
+    ```bash
+    git commit -a -m "fixed issues with S3 CDK and now complies with cfn-guard rules"
+    git push
+    ```
 1. View the CodePipeline in your account. Instructions to do that is [here](https://docs.aws.amazon.com/codepipeline/latest/userguide/pipelines-view-console.html#pipelines-list-console.). Give it about a minute to restart. Verify that the cfn-guard rules have passed. At this point the pipeline should deploy the S3 CDK application.
 1. Validate that the S3 bucket exists after the AWS CodePipeline completes. In the AWS Console browse over to S3. Look for a bucket with the prefix 'Bucket'.
 

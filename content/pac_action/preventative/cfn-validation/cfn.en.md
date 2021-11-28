@@ -7,28 +7,11 @@ The S3 application is ready to be deployed. In order for it to be deployed succe
 To kickoff the deployment use git push to AWS CodeCommit which is the source for the pipeline. During this workshop the CDK/CFN template will be
 changed to comply with the rules specified in the AWS CodePipeline. Do the following:
 
-1. Clone the workshop repo (If this is not already done.):
-    :::code{showCopyAction=true showLineNumbers=false}
-    cd ~/environment/policy-as-code
-    :::
-1. Remove the reference to the upstream code repo by issuing the command:
-    :::code{showCopyAction=true showLineNumbers=false}
-    git remote remove origin
-    :::
-1. Get the repository clone URL by running the the following commands and adding it as our remote origin:
-    ```
-    export repo=$(aws codecommit list-repositories --output text | awk '{print $3}' | grep policy-as-code)
-    export codecommiturl=$(aws codecommit get-repository --repository-name ${repo} --query 'repositoryMetadata.cloneUrlHttp'    --output text)
-    git remote add origin ${codecommiturl}
-    ```
-1. Make sure that you have the git-remote-codecommit python package installed. This helps with authenticating with CodeCommit.
-    :::code{showCopyAction=true}
-    pip install git-remote-codecommit
-    :::
-1. Push the repo
-    :::code{showCopyAction=true showLineNumbers=false}
+1. Make sure the steps in [Installing the Tools and the AWS CodePipeline](/getting-started/tool-installation) has been completed before continuing with this section.
+1. Push the repo by issue the command: 
+    ```bash
     git push --set-upstream origin main
-    :::
+    ```
 1. View the CodePipeline in your account. Instructions to do that is [here](https://docs.aws.amazon.com/codepipeline/latest/userguide/pipelines-view-console.html#pipelines-list-console.). Give it about a minute to restart. Initially the Pipeline will have failed because when deployed for the first time there was nothing in the CodeCommit repo.
 1. Your CodePipeline will fail on the stage **ScanDeploy** stage. Click on the **Details** on the Scan - AWS CodeBuild.
     ![ScanDeployFailed](/static/ScanDeployFailed.png)

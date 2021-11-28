@@ -27,7 +27,7 @@ Management Console.
 
 - Click **Next step**.
 
-- In **Environment settings** select **Create a new no-ingress EC2 instance for environment (access via Systems Manager)**, **m5.large**, **Amazon Linux 2 (recommended)** EC2 instance which will be paused after **30 minutes** of inactivity.
+- In **Environment settings** select **Create a new no-ingress EC2 instance for environment (access via Systems Manager)**, **t3.large**, **Amazon Linux 2 (recommended)** EC2 instance which will be paused after **30 minutes** of inactivity.
 
    ![Cloud9 Configure Settings](/static/images/prerequisites/cloud9-configure-settings.png)
 

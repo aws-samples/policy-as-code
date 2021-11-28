@@ -1,15 +1,35 @@
 import aws_cdk.aws_s3
-from aws_cdk import (
+from aws_cdk.core import (
     # core,
     Stack,
     RemovalPolicy,
     Duration,
     Tags,
     App,
+    )
+from aws_cdk import (    
     aws_s3,
     aws_kms,
     aws_iam
 )
+from aws_cdk.aws_lambda import (
+    DockerImageFunction,
+    DockerImageCode,
+)
+from aws_cdk.aws_config import (
+    CustomRule,
+    CfnRemediationConfiguration,
+    RuleScope,
+    ResourceType
+)
+from aws_cdk.aws_iam import (
+    ManagedPolicy,
+    PolicyStatement,
+    PolicyDocument,
+    Role,
+    ServicePrincipal
+)
+import os
 
 
 class S3AppStack(Stack):
@@ -40,6 +60,7 @@ class S3AppStack(Stack):
 
                                # Once you define the KMS key uncomment encryption_key=kms_key attribute
                                # encryption_key=kms_key,
+
                                lifecycle_rules=[
                                    aws_s3.LifecycleRule(
                                        enabled=True,
