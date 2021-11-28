@@ -100,10 +100,15 @@ class Base(core.Stack):
             effect=aws_iam.Effect.ALLOW,
             actions=['s3:CreateBucket'],
             resources=["*"]
+            )
         )
-        )
-
-
+        
+        #
+        # Uncomment if using terraform and regula
+        #
+        #scan.role.add_managed_policy(
+        #    aws_iam.ManagedPolicy.from_aws_managed_policy_name('AmazonS3FullAccess')
+        #)
 
         self.output_props = props.copy()
         self.output_props['bucket'] = bucket
