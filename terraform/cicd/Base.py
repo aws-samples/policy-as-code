@@ -26,29 +26,15 @@ class Base(core.Stack):
             self, "ParameterB",
             parameter_name=f"/{props['namespace']}/bucket",
             string_value=bucket.bucket_name,
-            description='cdk pipeline bucket'
+            description='terraform pipeline bucket'
         )
-        # ecr repo to push docker container into
-        # ecr = aws_ecr.Repository(
-        #     self, "ECR",
-        #     repository_name=f"{props['namespace']}",
-        #     removal_policy=core.RemovalPolicy.DESTROY
-        # )
-        # docker_asset = aws_ecr_assets.DockerImageAsset(
-        #     self, "DockerImage",
-        #     directory='pipeline_delivery/',
-        #     exclude=['.git', 'cdk', 'cdk.out'],
-        #
-        #     # repository_name=repo_name
-        # )
-
 
         # codebuild project meant to run in pipeline
         cb_docker_build = aws_codebuild.PipelineProject(
             self, "DockerBuild",
-            project_name=f"{props['namespace']}-cdk-synth",
+            project_name=f"{props['namespace']}-setup",
             build_spec=aws_codebuild.BuildSpec.from_source_filename(
-                filename='cdk/cicd/pipeline_delivery/docker_build_buildspec.yml'),
+                filename='terraform/cicd/pipeline_delivery/docker_build_buildspec.yml'),
             environment=aws_codebuild.BuildEnvironment(
                 privileged=False,
                 #build_image=aws_codebuild.LinuxBuildImage.from_ecr_repository(repository=docker_asset.repository, tag=docker_asset.asset_hash)
@@ -58,7 +44,7 @@ class Base(core.Stack):
             # pass the ecr repo uri into the codebuild project so codebuild knows where to push
             environment_variables={
                 'tag': aws_codebuild.BuildEnvironmentVariable(
-                    value='cdk')
+                    value='terraform')
             },
             description='Pipeline for CodeBuild',
             timeout=core.Duration.minutes(15),
@@ -78,7 +64,7 @@ class Base(core.Stack):
             # pass the ecr repo uri into the codebuild project so codebuild knows where to push
             environment_variables={
                 'tag': aws_codebuild.BuildEnvironmentVariable(
-                    value='cdk')
+                    value='terraform')
             },
             description='Codebuild Scan',
             timeout=core.Duration.minutes(15),
@@ -106,9 +92,9 @@ class Base(core.Stack):
         #
         # Uncomment if using terraform and regula
         #
-        #scan.role.add_managed_policy(
-        #    aws_iam.ManagedPolicy.from_aws_managed_policy_name('AmazonS3FullAccess')
-        #)
+        scan.role.add_managed_policy(
+            aws_iam.ManagedPolicy.from_aws_managed_policy_name('AmazonS3FullAccess')
+        )
 
         self.output_props = props.copy()
         self.output_props['bucket'] = bucket
