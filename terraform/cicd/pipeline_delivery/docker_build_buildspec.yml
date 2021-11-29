@@ -1,0 +1,27 @@
+version: 0.2
+
+phases:
+  install:
+
+    runtime-versions:
+      python: 3.8
+      nodejs: 16
+    commands:
+      - apt-get install -y jq
+  pre_build:
+    commands:
+      - rm -rf .python-version
+      - ls
+      - export PYTHONPATH=$CODEBUILD_SRC_DIR
+      - env | grep -i CODEBUILD
+  build:
+    commands:
+      - cp $CODEBUILD_SRC_DIR/terraform/cicd/pipeline_delivery/scan_buildspec.yml $CODEBUILD_SRC_DIR/terraform/app/scan_buildspec.yml # copying the artifact to the new source to avoid dealing with primary and secondary artifacts
+artifacts:
+  name: buildspec
+  packaging: zip
+  files:
+    - '**/*'
+  base-directory: $CODEBUILD_SRC_DIR/terraform/app/
+
+

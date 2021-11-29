@@ -1,0 +1,18 @@
+version: 0.2
+
+phases:
+
+  pre_build:
+    commands:
+      - rm -rf .python-version
+  build:
+    commands:
+      - regula run -i ./custom-rules main.tf
+      - terraform init
+      - terraform apply
+artifacts:
+  name: scanned_source
+  packaging: zip
+  files:
+    - '**/*'
+  base-directory: $CODEBUILD_SRC_DIR
