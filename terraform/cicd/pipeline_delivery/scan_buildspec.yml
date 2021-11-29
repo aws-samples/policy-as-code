@@ -9,7 +9,7 @@ phases:
     commands:
       - regula run -i ./custom-rules main.tf
       - terraform init
-      - terraform apply
+      - terraform apply -auto-approve
 artifacts:
   name: scanned_source
   packaging: zip

@@ -186,4 +186,10 @@ weight: 20
     // End of S3 bucket policy
     ...
     ```
+1. Commit the changes to the repo and push to the source CodeCommit repo to kick of the pipeline.
+    ```bash
+    cd ~/environment/policy-as-code/
+    git commit -a -m "fix regula violations in s3_deployment.py"
+    git push
+    ```
 
