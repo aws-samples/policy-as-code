@@ -13,44 +13,15 @@ phases:
       - rm -rf .python-version
       - ls
       - export PYTHONPATH=$CODEBUILD_SRC_DIR
-      - export cicd=cdk/cicd
-      - export app=cdk/app
-      # - cd $CODEBUILD_SRC_DIR
-      # - env | grep -i CODEBUILD_SRC_DIR
       - env | grep -i CODEBUILD
-      # - echo CODEBUILD_RESOLVED_SOURCE_VERSION $CODEBUILD_RESOLVED_SOURCE_VERSION
-      # - echo CODEBUILD_SOURCE_VERSION $CODEBUILD_SOURCE_VERSION
-      #- npm install -g aws-cdk
-      - pip3 install -r ${cicd}/requirements.txt
-      - pip3 install -r ${app}/requirements.txt
-
-
-#      - python3 $CODEBUILD_SRC_DIR/cicd/generate_cb_creds.py
-#      - cat $CODEBUILD_SRC_DIR/cicd/cb_credentials
-#      - export AWS_CONFIG_FILE="$CODEBUILD_SRC_DIR/cicd/cb_credentials"
-#      - echo "AWS_CONFIG_FILE=${AWS_CONFIG_FILE}"
-#      - ACCOUNT=$(aws sts get-caller-identity --profile dev --query Account --output text)
-#      - ARN=$(aws sts get-caller-identity --profile dev --query Arn --output text)
-#      - echo deploying to $ARN
-#      - export CDK_DEFAULT_ACCOUNT=${ACCOUNT}
-#      - export CDK_DEFAULT_REGION=$AWS_DEFAULT_REGION
-#      - env | grep -i CDK
-      #- cdk bootstrap -f aws://$ACCOUNT/$AWS_DEFAULT_REGION --profile dev
-
-
-
   build:
     commands:
-      - cd $CODEBUILD_SRC_DIR/${app}
-      - cdk synth
-      - cp $CODEBUILD_SRC_DIR/cdk/cicd/pipeline_delivery/scan_buildspec.yml $CODEBUILD_SRC_DIR/cdk/app/scan_buildspec.yml # copying the artifact to the new source to avoid dealing with primary and secondary artifacts
-#     - cp $CODEBUILD_SRC_DIR/cdk/app/checkov-config.yml $CODEBUILD_SRC_DIR/cdk/app/cdk.out/checkov-config.yml
-#      - cdk deploy "*" --require-approval never -v --previous-parameters=false
+      - cp $CODEBUILD_SRC_DIR/terraform/cicd/pipeline_delivery/scan_buildspec.yml $CODEBUILD_SRC_DIR/terraform/app/scan_buildspec.yml # copying the artifact to the new source to avoid dealing with primary and secondary artifacts
 artifacts:
-  name: synth
+  name: buildspec
   packaging: zip
   files:
     - '**/*'
-  base-directory: $CODEBUILD_SRC_DIR/cdk/app/
+  base-directory: $CODEBUILD_SRC_DIR/terraform/app/
 
 
