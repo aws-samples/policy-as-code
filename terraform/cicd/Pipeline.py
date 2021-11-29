@@ -39,7 +39,7 @@ class Pipeline(core.Stack):
                     stage_name='Build',
                     actions=[
                         aws_codepipeline_actions.CodeBuildAction(
-                            action_name='Setup Buildspec',
+                            action_name='Setup-Buildspec',
                             input=source_output,
                             outputs=[buildspec],
                             project=props['cb_docker_build'],
