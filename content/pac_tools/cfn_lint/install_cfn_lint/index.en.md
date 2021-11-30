@@ -2,23 +2,26 @@
 title: "Installing CFN Lint"
 weight: 13
 ---
+
 The following steps describe how to install CFN Lint
 
-We strongly suggest you checkout: 
-* This Page has the most up to date instructions
-* [CFN Lint](https://github.com/aws-cloudformation/cfn-lint)
+We strongly suggest you checkout:
 
+- This Page has the most up to date instructions
+- [CFN Lint](https://github.com/aws-cloudformation/cfn-lint)
+
+::alert[ **NOTE**: If you are attending an AWS Hosted Event to do this workshop OR you ran the bootstrap.sh script earlier, this step is not necessary! Only do this step if you elected not to run the bootstrap.sh script.]
 
 ## Install CFN Lint CLI
 
 ###Python
+
 ```bash
 pip install cfn-lint
 ```
 
-
-
 ### Verify CFN Lint Installation
+
 Check to see that you can run the cli for cfn-lint on your terminal.
 
 ```
@@ -80,4 +83,3 @@ Advanced / Debugging:
   -u, --update-specs    Update the CloudFormation Specs
 
 ```
-
