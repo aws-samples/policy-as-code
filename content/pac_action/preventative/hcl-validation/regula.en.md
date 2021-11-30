@@ -143,7 +143,7 @@ weight: 20
             Action = "s3:*"
             Effect = "Deny"
             Resource = [
-              "${aws_s3_bucket.b.id}"
+              "${aws_s3_bucket.b.arn}"
             ]
             Condition = {
               Bool = {
