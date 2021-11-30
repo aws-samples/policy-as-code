@@ -2,17 +2,23 @@
 title: "Installing Checkov"
 weight: 31
 ---
-## Install CFN Lint CLI
+
+::alert[ **NOTE**: If you are attending an AWS Hosted Event to do this workshop OR you ran the bootstrap.sh script earlier, this step is not necessary! Only do this step if you elected not to run the bootstrap.sh script.]
+
+## Install Checkov CLI
 
 ### Python
+
 ```bash
 pip3 install checkov
 ```
 
 ### Docker
-* [DockerHub](https://hub.docker.com/r/bridgecrew/checkov)
+
+- [DockerHub](https://hub.docker.com/r/bridgecrew/checkov)
 
 ### Verify Checkov Installation
+
 Check to see that you can run the cli for checkov on your terminal.
 
 ```
@@ -32,4 +38,3 @@ Update available 2.0.390 -> 2.0.410
 Run pip3 install -U checkov to update
 
 ```
-
