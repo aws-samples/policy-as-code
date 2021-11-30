@@ -98,6 +98,15 @@ class Base(core.Stack):
         scan.role.add_managed_policy(
             aws_iam.ManagedPolicy.from_aws_managed_policy_name('AWSKeyManagementServicePowerUser')
         )
+        scan.role.add_to_policy(aws_iam.PolicyStatement(
+            effect=aws_iam.Effect.ALLOW,
+            actions=[
+                'kms:EnableKeyRotation',
+                'kms:GetKeyRotationStatus'
+            ],
+            resources=["*"]
+            )
+        )
 
         self.output_props = props.copy()
         self.output_props['bucket'] = bucket
