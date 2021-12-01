@@ -4,6 +4,7 @@ weight: 12
 ---
 
 This section will explore using AWS CC API, cfn-guard, and the AWS Config Custom Rule to provide a detective control for the S3 deployment. Using what was learned in [CC API and cfn-guard](/pac-action/detective/ccapi/ccapi).
+::alert[Make sure that the S3 bucket with a name like **policy-as-codexxxx-xxxxx** has been deployed before continuing]
 
 1. Enable AWS Config by navigating to the AWS Config service page and click on the button **1-click setup**:
     ![AWSConfigServicePage.png](/static/AWSConfigServicePage.png)
