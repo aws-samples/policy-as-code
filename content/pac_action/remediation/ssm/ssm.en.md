@@ -14,7 +14,7 @@ This section uses the work done in [AWS Config Custom Rule](/pac-action/detectiv
     ```bash
             automation_assume_role = Role(self,
                                           'AutomationAssumeRole',
-                                          assumed_by=ServicePrincipal(service='ssm.amazonaws.com'),
+                                          assumed_by=ServicePrincipal('ssm.amazonaws.com'),
                                           managed_policies=[ ManagedPolicy.from_managed_policy_arn(self, 'AmazonSSMAutomation', 'arn:aws:iam::aws:policy/service-role/AmazonSSMAutomationRole') ],
                                           inline_policies={
                                               "S3FullAccess": 
@@ -48,8 +48,8 @@ This section uses the work done in [AWS Config Custom Rule](/pac-action/detectiv
     ```
 1. Commit the code to the git repo:
     ```bash
-    git commit -a -m "updated to deploy remediation with SSM document"
-    git push
+    cd ~/environment/policy-as-code/cdk/app
+    cdk deploy --require-approval never
     ```
 1. Navigate to the S3 bucket and change the permissions for the *Block public access** as specified below:
     ![S3 Public Access to fix](/static/images/prerequisites/s3-public-access-fix.png)

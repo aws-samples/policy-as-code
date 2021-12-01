@@ -10,9 +10,14 @@ This section will explore the output of the AWS Cloud Control API as well as how
     aws --version
     ``` 
     You should be on a version 2.3.6+ or higher.
+1. Locate the S3 bucket deployed by the pipeline by issue the following command:
+    ```bash
+    aws s3 ls
+    ```
+    Look for a bucket with the pattern **policy-as-code-bucketxxxx-xxx**
 1. Issue the following for the name of the S3 bucket from the previous section of this workshop:
     ```bash
-    aws cloudcontrol get-resource --type-name "AWS::S3::Bucket" --identifier "<Replace with the name of the S3 bucket>"
+    aws cloudcontrol get-resource --type-name "AWS::S3::Bucket" --identifier "<Replace with the name policy-as-code-bucketxxxx-xxx>"
     ```
     The output will look something like this:
     ```
@@ -29,7 +34,7 @@ This section will explore the output of the AWS Cloud Control API as well as how
 1. Using the utility jq the output can be converted to a CloudFormation style resource. Do the following:
     ```bash
     cd ~/environment/policy-as-code/cdk/app
-    aws cloudcontrol get-resource --type-name "AWS::S3::Bucket" --identifier <Replace with name of the S3 Bucket> | jq '. | {Resources: {(.ResourceDescription.Identifier): {Type: .TypeName, Properties: .ResourceDescription.Properties | fromjson}}}' > s3-cfn.json
+    aws cloudcontrol get-resource --type-name "AWS::S3::Bucket" --identifier <Replace with the name policy-as-code-bucketxxxx-xxx> | jq '. | {Resources: {(.ResourceDescription.Identifier): {Type: .TypeName, Properties: .ResourceDescription.Properties | fromjson}}}' > s3-cfn.json
     ```
 1. There should be a file in the current directory named **s3-cfn.json**. It should now be possible to validate this AWS resource against the cfn-guard rules. Do the following:
     ```bash
