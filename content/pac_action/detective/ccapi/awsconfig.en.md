@@ -5,7 +5,13 @@ weight: 12
 
 This section will explore using AWS CC API, cfn-guard, and the AWS Config Custom Rule to provide a detective control for the S3 deployment. Using what was learned in [CC API and cfn-guard](/pac-action/detective/ccapi/ccapi).
 
-1. Validate the following directory:
+1. Enable AWS Config by navigating to the AWS Config service page and click on the button **1-click setup**:
+    ![AWSConfigServicePage.png](/static/AWSConfigServicePage.png)
+1. Click on the button **Confirm**
+    ![AWSConfigConfirm.png](/static/AWSConfigConfirm.png)
+1. When successful you should see the AWS Config Dashboard:
+    ![AWSConfigDashboard.png](/static/AWSConfigDashboard.png)
+1. Go back to the Cloud9 instance and validate the following directory:
     ```bash
     cd ~/environment/policy-as-code/cdk/app
     ls awsconfig
@@ -122,12 +128,12 @@ This section will explore using AWS CC API, cfn-guard, and the AWS Config Custom
         # End of AWS Config Custom Rule
         ...
     ```
-1. The S3 deployment code is ready to be deployed with the AWS Config Custom Rule. Do the following:
+1. The AWS Config Custom Rule is ready to be deployed. Do the following:
     ```bash
-    git commit -a -m "updated to deploy AWS Config custom rule."
-    git push
+    cd ~/environment/policy-as-code/cdk/app
+    cdk deploy --require-approval never
     ```
-1. The AWS CodePipeline should kickoff and deploy the AWS Config Custom Rule. If this is successfully you should see the output:
+1. If this is successfully you should see the output similiar to this:
     ![AWSConfig Deploy](/static/images/prerequisites/awsconfig-deploy-success.png)
 
     Also the command:
@@ -136,6 +142,7 @@ This section will explore using AWS CC API, cfn-guard, and the AWS Config Custom
     ```
 
     Should return a JSON object.
+1. Look for an S3 bucket with a name like **policy-as-code-bucket** in the S3 console page.
 1. Once the config rule has been succesfully deployed a policy violation needs to be simulated. Do that by changing the permission of the S3 Bucket. Navigate to the S3 service and click on the **Permissions** tab:
     ![S3 Bucket Permissions](/static/images/prerequisites/s3-bucket-permissions.png)
 1. Change the **Block public access to buckets and objects granted through new access control lists (ACLs)** to be false as shown below:
