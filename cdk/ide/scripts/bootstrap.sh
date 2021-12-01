@@ -57,6 +57,14 @@ chmod +x $BIN_DIR/cfn-guard
 # Install Python 3.8
 sudo amazon-linux-extras install python3.8 -y
 
+# Uninstall AWSCLI v1
+sudo pip2 uninstall awscli -y
+
+# Install AWSCLI v2
+cd $TMP_DIR
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && unzip awscliv2.zip && sudo ./aws/install
+source $HOME_DIR/.bashrc
+
 # Configure Python virtual environment 
 cd $HOME_DIR
 python3.8 -m venv $HOME_DIR/.env
