@@ -18,4 +18,5 @@ Next explore one of these sections:
 - [Preventative Controls](/pac-action/preventative)
   - [AWS CDK/CF and CloudFormation Guard](/pac-action/preventative/cfn-validation)
   - [Terraform HCL and Regula/OPA](/pac-action/preventative/hcl-validation)
+    ::alert[Terraform HCL and Regula/OPA section currently only covers the preventative controls.]
 - [CloudFormation Guard Basics](/pac-tools/cfn-guard/the-basics)
