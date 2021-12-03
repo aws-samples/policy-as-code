@@ -50,7 +50,7 @@ Resources:
 :::
 
 
-We'll make some assertions about the properties that are set to get us familiar with writing clauses. Let's validate that the tag for this resource is not empty. Create a file name **clause.guard** with the following content:
+We'll make some assertions about the properties that are set to get us familiar with writing clauses. Let's validate that the tag for this resource is not empty. Create a file name **clauses.guard** with the following content:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
 Resources.*.Properties.Tags !empty
@@ -61,7 +61,7 @@ One thing to note is the '*' would normally retrieve all the Resources in a Clou
 Let's run our validation to look at the results. Issue the following command:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clause.guard -—show-summary all
+cfn-guard validate -d rds_demo.yaml -r clauses.guard -—show-summary all
 :::
 
 You'll get an output like this:
@@ -73,7 +73,7 @@ clauses.guard/default    PASS
 ---
 ```
 
-Next let's limit the number of instances that you can deploy where the minimum is a large and the maximum is a xlarge db.m5 class type. Add the following clause to the file **clause.guard**:
+Next let's limit the number of instances that you can deploy where the minimum is a large and the maximum is a xlarge db.m5 class type. Add the following clause to the file **clauses.guard**:
 
 :::code{showCopyAction=true showLineNumbers=false}
 Resources.*.Properties.DBInstanceClass IN ['db.m5.large', 'db.m5.xlarge']
@@ -82,7 +82,7 @@ Resources.*.Properties.DBInstanceClass IN ['db.m5.large', 'db.m5.xlarge']
 Let's validate:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clause.guard -—show-summary all
+cfn-guard validate -d rds_demo.yaml -r clauses.guard -—show-summary all
 :::
 ```
 rds_demo.yaml Status = PASS
@@ -93,7 +93,7 @@ clauses.guard/default    PASS
 
 Here the **IN** operator will allow any of the listed instance types.
 
-We'd like to check [AllocatedStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html#cfn-rds-dbinstance-allocatedstorage) and provide a minimum and maximum. We could string together a series of operators like **>**, **>=**, **<=**, or **<** to do this, however let's use a range operator. Add the following clause to the file **clause.guard**:
+We'd like to check [AllocatedStorage](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html#cfn-rds-dbinstance-allocatedstorage) and provide a minimum and maximum. We could string together a series of operators like **>**, **>=**, **<=**, or **<** to do this, however let's use a range operator. Add the following clause to the file **clauses.guard**:
 
 :::code{showCopyAction=true showLineNumbers=false}
 Resources.*.Properties.AllocatedStorage IN r[100, 1000]
@@ -102,7 +102,7 @@ Resources.*.Properties.AllocatedStorage IN r[100, 1000]
 Running the validation:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clause.guard -—show-summary all
+cfn-guard validate -d rds_demo.yaml -r clauses.guard -—show-summary all
 :::
 ```
 rds_demo.yaml Status = PASS
@@ -113,7 +113,7 @@ clauses.guard/default    PASS
 
 You can also use **r(100, 1000)** where the '**()**' in a range means non-inclusive. So this range would not include 100 or 1000 but 101 and 999 would work.
 
-Perhaps we might have another clause that restricts the [EngineVersion](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html#cfn-rds-dbinstance-engineversion) we are allowed to use. Add the following clause to the file **clause.guard**:
+Perhaps we might have another clause that restricts the [EngineVersion](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html#cfn-rds-dbinstance-engineversion) we are allowed to use. Add the following clause to the file **clauses.guard**:
 
 :::code{showCopyAction=true showLineNumbers=false}
 Resources.*.Properties.EngineVersion == /8.0.2[0-5]/
@@ -121,7 +121,7 @@ Resources.*.Properties.EngineVersion == /8.0.2[0-5]/
 
 This is an example of using a regex. This would restrict us to only [EngineVersion](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html#cfn-rds-dbinstance-engineversion) 8.0.20 - 8.0.25. 
 
-How would we check to make sure that our storage is encrypted? As a start we should see if the [StorageEncrypted](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html#cfn-rds-dbinstance-storageencrypted) property is set. Add the following clause to the file **clause.guard**:
+How would we check to make sure that our storage is encrypted? As a start we should see if the [StorageEncrypted](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance.html#cfn-rds-dbinstance-storageencrypted) property is set. Add the following clause to the file **clauses.guard**:
 
 :::code{showCopyAction=true showLineNumbers=false}
 Resources.*.Properties.StorageEncrypted exists
@@ -139,7 +139,7 @@ clauses.guard/default    PASS
 ---
 ```
 
-However we should also check that the [StorageEncrypted](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance) is set to true. Add the following clause to the file **clause.guard**:
+However we should also check that the [StorageEncrypted](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-rds-database-instance) is set to true. Add the following clause to the file **clauses.guard**:
 
 :::code{showCopyAction=true showLineNumbers=false}
 Resources.*.Properties.StorageEncrypted == true
@@ -176,7 +176,7 @@ Resources.*.Properties.StorageEncrypted == true
 Let's run the validation:
 
 :::code{showCopyAction=true showLineNumbers=false language=shell}
-cfn-guard validate -d rds_demo.yaml -r clauses.guard -—show-summary all
+cfn-guard validate -d rds_demo.yaml -r clause.guard -—show-summary all
 :::
 ```
 rds_demo.yaml Status = FAIL
