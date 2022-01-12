@@ -101,7 +101,7 @@ multidict==5.2.0
 networkx==2.6.3
 packageurl-python==0.9.6
 packaging==21.3
-pipenv==2021.5.29
+pipenv==2022.1.8
 platformdirs==2.4.0
 policy-sentry==0.11.18
 policyuniverse==1.4.0.20210819
