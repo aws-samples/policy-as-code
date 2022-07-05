@@ -106,7 +106,7 @@ platformdirs==2.4.0
 policy-sentry==0.11.18
 policyuniverse==1.4.0.20210819
 publication==0.0.3
-pycares==4.1.2
+pycares==4.2.0
 pycparser==2.21
 pyparsing==3.0.6
 python-dateutil==2.8.2
