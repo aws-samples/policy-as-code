@@ -1,5 +1,5 @@
 aiodns==3.0.0
-aiohttp==3.9.2
+aiohttp==3.9.4
 aiomultiprocess==0.9.0
 aiosignal==1.2.0
 async-timeout==4.0.1
