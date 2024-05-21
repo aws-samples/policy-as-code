@@ -111,7 +111,7 @@ pycparser==2.21
 pyparsing==3.0.6
 python-dateutil==2.8.2
 PyYAML==6.0
-requests==2.31.0
+requests==2.32.0
 requirements-parser==0.2.0
 s3transfer==0.5.0
 schema==0.7.4
