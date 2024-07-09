@@ -130,4 +130,4 @@ virtualenv==20.9.0
 virtualenv-clone==0.5.7
 websocket-client==1.2.1
 yarl==1.7.2
-zipp==3.6.0
+zipp==3.19.1
